@@ -1,0 +1,41 @@
+/* ── Theme Variables ─────────────────────────── */
+:root[data-theme="dark"] {
+  --bg0: #0b0d14;
+  --bg1: #12151f;
+  --bg2: #1a1e2e;
+  --bg3: #242840;
+  --border: #2a2e45;
+  --text1: #f0f1f7;
+  --text2: #8b90a8;
+  --text3: #555a72;
+  --accent: #6c63ff;
+  --accent2: #a78bfa;
+  --input-bg: #12151f;
+  --btn-bg: #1a1e2e;
+  --btn-hover: #242840;
+  --scrollbar: #2a2e45;
+}
+:root[data-theme="light"] {
+  --bg0: #f0f2f8;
+  --bg1: #ffffff;
+  --bg2: #f5f6fc;
+  --bg3: #e8eaf6;
+  --border: #d0d4e8;
+  --text1: #1a1d2e;
+  --text2: #5a5f7a;
+  --text3: #9ca3b8;
+  --accent: #5548e8;
+  --accent2: #7c3aed;
+  --input-bg: #ffffff;
+  --btn-bg: #f5f6fc;
+  --btn-hover: #e8eaf6;
+  --scrollbar: #d0d4e8;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { height: 100%; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg0); color: var(--text1); transition: background 0.3s, color 0.3s; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+@keyframes posterFlash { 0% { opacity: 0.5; transform: scale(0.97); } 100% { opacity: 1; transform: scale(1); } }
+.poster-flash { animation: posterFlash 0.35s ease-out; }
+@media print { body > * { display: none !important; } #poster-canvas { display: block !important; width: 100% !important; } }
