@@ -20,7 +20,7 @@ function LayoutGrid({ selected, onChange }) {
           title={name}
         >
           <div className={styles.thumbBars}>
-            <div className={styles.ltBar} style={{ width: '100%', height: 7 }} /> //design within the button or wach template icon
+            <div className={styles.ltBar} style={{ width: '100%', height: 7 }} /> 
             <div className={styles.ltBar} style={{ width: '70%', height: 4 }} />
             <div className={styles.ltBar} style={{ width: '50%', height: 4 }} />
           </div>
@@ -186,7 +186,10 @@ export default function DesignTab() {
       <SectionLabel>Text Alignment</SectionLabel>
       <AlignRow
         selected={align}
-        onChange={(value) => setDesignField('align', value)}
+        onChange={(value) => {
+          setDesignField('align', value);
+          setDesignField('logoMode', 'auto');
+        }}
       />
 
       <SectionLabel>Poster Size</SectionLabel>
@@ -198,4 +201,3 @@ export default function DesignTab() {
     </>
   );
 }
-

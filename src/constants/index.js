@@ -128,4 +128,6 @@ export const DEFAULT_DESIGN = {
   font: 'Georgia,serif|Trebuchet MS,sans-serif',
   align: 'center',
   size: 'a4',
+  logoMode: 'auto',
+  logoX: 0,
 };

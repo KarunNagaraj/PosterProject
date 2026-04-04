@@ -2,7 +2,7 @@
 export function SpeakerCard({ img, name, title, alumni, accent, df, bf, size = 52 }) {
   if (!name && !img) return null;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: 220 }}>
       {img ? (
         <img
           src={img}
@@ -20,7 +20,7 @@ export function SpeakerCard({ img, name, title, alumni, accent, df, bf, size = 5
           flexShrink: 0, fontSize: size > 44 ? 20 : 16,
         }}>👤</div>
       )}
-      <div>
+      <div style={{flex : 1}}>
         {name && (
           <div style={{ fontFamily: df, fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>
             {name}
@@ -100,7 +100,12 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
       }}>
         Resource Person{poster.sp2name ? 's' : ''}
       </div>
-      <div style={{ display: 'flex', gap: 18, justifyContent: centered ? 'center' : 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{
+            display: 'flex',
+            flexDirection: 'column',   // ← ADD
+            gap: 14,                   // ← adjust spacing
+            alignItems: centered ? 'center' : 'flex-start', // ← ADD
+          }}>
         <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={accent} df={df} bf={bf} />
         {poster.sp2name && (
           <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={accent} df={df} bf={bf} />

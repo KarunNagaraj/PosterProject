@@ -24,13 +24,46 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
 export function L0_Classic({ poster, design, qrDataUrl }) {
   const { acc, al, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
   const alignStyle = { textAlign: al };
-  const logoMargin = al === 'left' ? '0 auto 8px 0' : al === 'right' ? '0 0 8px auto' : '0 auto 8px';
+ const isManualLogo = design.logoMode === 'manual';
+
+  const logoStyle = isManualLogo
+  ? {
+      position: 'absolute',
+      top: 0,
+      left: design.logoX ?? 0,
+    }
+  : {
+      margin:
+        al === 'left'
+          ? '0 auto 8px 0'
+          : al === 'right'
+          ? '0 0 8px auto'
+          : '0 auto 8px',
+    };
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
       {/* Header */}
-      <div style={{ background: 'rgba(0,0,0,0.38)', padding: '22px 24px', ...alignStyle, borderBottom: `3px solid ${acc}` }}>
-        {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 56, width: 56, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 4, marginBottom: 8, display: 'block', margin: logoMargin }} />}
+      <div style={{ position: 'relative',background: 'rgba(0,0,0,0.38)', padding: '22px 24px', ...alignStyle, borderBottom: `3px solid ${acc}` }}>
+          {poster.logoImg && (
+            <div style={{ height: 64, position: 'relative' }}>
+              <img
+                data-type="logo"
+                src={poster.logoImg}
+                alt="logo"
+                style={{
+                  height: 56,
+                  width: 56,
+                  objectFit: 'contain',
+                  borderRadius: '50%',
+                  background: '#fff',
+                  padding: 4,
+                  display: 'block',
+                  ...logoStyle
+                }}
+              />
+            </div>
+          )}
         {poster.university && <div style={{ fontFamily: df, fontSize: 17, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>{poster.university}</div>}
         {poster.dept       && <div style={{ fontFamily: bf, fontSize: 12, color: acc, marginTop: 2, fontWeight: 600, letterSpacing: '0.05em' }}>{poster.dept}</div>}
         {poster.campus     && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{poster.campus}</div>}
