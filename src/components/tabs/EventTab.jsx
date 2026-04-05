@@ -1,6 +1,6 @@
 import { useShallow } from 'zustand/react/shallow';
 import { FieldGroup, TextInput, Select, Row2, SectionLabel } from '../UI';
-import { CATEGORIES } from '../../constants';
+import { SDG_OPTIONS,CATEGORIES } from '../../constants';
 import { usePosterStore } from '../../store/usePosterStore';
 
 export default function EventTab() {
@@ -16,6 +16,7 @@ export default function EventTab() {
     showQR,
     setPosterField,
     applyCategoryTheme,
+    sdgs,
   } = usePosterStore(
     useShallow((state) => ({
       category: state.poster.category,
@@ -29,6 +30,7 @@ export default function EventTab() {
       showQR: state.poster.showQR,
       setPosterField: state.setPosterField,
       applyCategoryTheme: state.applyCategoryTheme,
+      sdgs: state.poster.sdgs,
     }))
   );
 
@@ -36,6 +38,21 @@ export default function EventTab() {
     setPosterField('category', val);
     applyCategoryTheme(val);
   };
+  const handleSDGChange = (value) => {
+      let updated = [...sdgs];
+
+      if (updated.includes(value)) {
+        // remove if already selected
+        updated = updated.filter((v) => v !== value);
+      } else {
+        // add if less than 3
+        if (updated.length < 3) {
+          updated.push(value);
+        }
+      }
+
+      setPosterField('sdgs', updated);
+    };
 
   return (
     <>
@@ -116,6 +133,34 @@ export default function EventTab() {
           ]}
         />
       </FieldGroup>
+           <SectionLabel>Sustainable Development Goals</SectionLabel>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {SDG_OPTIONS.map((sdg) => {
+                  const selected = sdgs.includes(sdg.value);
+
+                  return (
+                    <button
+                      key={sdg.value}
+                      onClick={() => handleSDGChange(sdg.value)}
+                      style={{
+                        border: selected ? '2px solid #4ade80' : '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: 6,
+                        padding: 4,
+                        cursor: 'pointer',
+                        background: 'transparent',
+                        opacity: selected ? 1 : 0.6,
+                      }}
+                    >
+                      <img
+                        src={sdg.img}
+                        alt={sdg.label}
+                        style={{ width: 40, height: 40 }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
 
    
       

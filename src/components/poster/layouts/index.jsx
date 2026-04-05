@@ -1,4 +1,4 @@
-import { GRADIENTS } from '../../../constants';
+import { GRADIENTS, SDG_OPTIONS } from '../../../constants';
 import { buildBackground, formatDate, formatTime, getDisplayFont, getBodyFont } from '../../../utils';
 import { SpeakerCard, SpeakerFooter, InfoRow, QRBlock, TaglineBar } from '../PosterParts';
 
@@ -7,6 +7,7 @@ import { SpeakerCard, SpeakerFooter, InfoRow, QRBlock, TaglineBar } from '../Pos
 
 function useLayoutProps({ poster, design, qrDataUrl }) {
   const acc = design.accent;
+  const pri = design.primary;
   const al  = design.align;
   const df  = getDisplayFont(design.font);
   const bf  = getBodyFont(design.font);
@@ -15,14 +16,14 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
   const dateTimeStr = [formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ');
   const showQR = poster.showQR && !!qrDataUrl;
 
-  return { acc, al, df, bf, bg, g, dateTimeStr, showQR };
+  return { acc, pri, al, df, bf, bg, g, dateTimeStr, showQR };
 }
 
 // ─────────────────────────────────────────────
 // L0 — Classic
 // ─────────────────────────────────────────────
 export function L0_Classic({ poster, design, qrDataUrl }) {
-  const { acc, al, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, al, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
   const alignStyle = { textAlign: al };
  const isManualLogo = design.logoMode === 'manual';
 
@@ -45,28 +46,28 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
       {/* Header */}
       <div style={{ position: 'relative',background: 'rgba(0,0,0,0.38)', padding: '22px 24px', ...alignStyle, borderBottom: `3px solid ${acc}` }}>
-          {poster.logoImg && (
-            <div style={{ height: 64, position: 'relative' }}>
-              <img
-                data-type="logo"
-                src={poster.logoImg}
-                alt="logo"
-                style={{
-                  height: 56,
-                  width: 56,
-                  objectFit: 'contain',
-                  borderRadius: '50%',
-                  background: '#fff',
-                  padding: 4,
-                  display: 'block',
-                  ...logoStyle
-                }}
-              />
-            </div>
-          )}
-        {poster.university && <div style={{ fontFamily: df, fontSize: 17, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>{poster.university}</div>}
+        {poster.logoImg && (
+          <div style={{ height: 64, position: 'relative' }}>
+            <img
+              data-type="logo"
+              src={poster.logoImg}
+              alt="logo"
+              style={{
+                height: 56,
+                width: 56,
+                objectFit: 'contain',
+                borderRadius: '50%',
+                background: '#fff',
+                padding: 4,
+                display: 'block',
+                ...logoStyle
+              }}
+            />
+          </div>
+        )}
+        {poster.university && <div style={{ fontFamily: df, fontSize: 17, fontWeight: 700, color: pri, letterSpacing: '0.04em' }}>{poster.university}</div>}
         {poster.dept       && <div style={{ fontFamily: bf, fontSize: 12, color: acc, marginTop: 2, fontWeight: 600, letterSpacing: '0.05em' }}>{poster.dept}</div>}
-        {poster.campus     && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{poster.campus}</div>}
+        {poster.campus     && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}99`, marginTop: 2 }}>{poster.campus}</div>}
       </div>
 
       {/* Category band */}
@@ -77,19 +78,19 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
       {/* Body */}
       <div style={{ flex: 1, padding: '26px 24px', ...alignStyle, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {poster.title
-          ? <div style={{ fontFamily: df, fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: 10, textShadow: '0 2px 14px rgba(0,0,0,0.4)' }}>{poster.title}</div>
-          : <div style={{ fontFamily: 'Georgia', fontSize: 20, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>Event Title</div>
+          ? <div style={{ fontFamily: df, fontSize: 26, fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 10, textShadow: '0 2px 14px rgba(0,0,0,0.4)' }}>{poster.title}</div>
+          : <div style={{ fontFamily: 'Georgia', fontSize: 20, color: `${pri}33`, fontStyle: 'italic' }}>Event Title</div>
         }
         {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 13, color: acc, marginBottom: 18, fontStyle: 'italic' }}>{poster.subtitle}</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
-          <InfoRow icon="📅" text={[formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ')} accent={acc} bf={bf} align={al} />
-          <InfoRow icon="📍" text={poster.venue}    accent={acc} bf={bf} align={al} />
-          <InfoRow icon="👥" text={poster.audience} accent={acc} bf={bf} align={al} />
+          <InfoRow icon="📅" text={[formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ')} accent={acc} primary={pri} bf={bf} align={al} />
+          <InfoRow icon="📍" text={poster.venue}    accent={acc} primary={pri} bf={bf} align={al} />
+          <InfoRow icon="👥" text={poster.audience} accent={acc} primary={pri} bf={bf} align={al} />
         </div>
         <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
       </div>
 
-      <SpeakerFooter poster={poster} accent={acc} bf={bf} df={df} />
+      <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
       <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} bf={bf} />
     </div>
   );
@@ -99,60 +100,224 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
 // L1 — Editorial
 // ─────────────────────────────────────────────
 export function L1_Editorial({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+
+  // Prepare SDGs cleanly
+  const selectedSDGs = (poster.sdgs || [])
+    .map(id => SDG_OPTIONS.find(s => s.value === id))
+    .filter(Boolean);
 
   return (
-    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative' }}>
+    <div style={{
+      ...parse(bg),
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 'inherit',
+      position: 'relative'
+    }}>
+
       <div style={{ position: 'absolute', top: 0, right: 0, width: 4, height: '100%', background: acc }} />
       <div style={{ position: 'absolute', top: 0, left: 0, width: '55%', height: 4, background: acc }} />
 
       <div style={{ padding: '28px 36px 0 28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+
         {/* Institution row */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}>
-          {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 48, width: 48, objectFit: 'contain', borderRadius: 4, background: 'rgba(255,255,255,0.12)', padding: 3, flexShrink: 0 }} />}
+          {poster.logoImg && (
+            <img
+              src={poster.logoImg}
+              alt="logo"
+               style={{ height: 60, width: 60, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6, marginBottom: 10, position: 'relative' }}
+            />
+          )}
           <div>
-            {poster.university && <div style={{ fontFamily: df, fontSize: 14, fontWeight: 700, color: '#fff' }}>{poster.university}</div>}
-            {poster.dept       && <div style={{ fontFamily: bf, fontSize: 11, color: acc, marginTop: 2 }}>{poster.dept}</div>}
-            {poster.campus     && <div style={{ fontFamily: bf, fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>{poster.campus}</div>}
+            {poster.university && <div style={{ fontFamily: df, fontSize: 14, fontWeight: 700, color: pri }}>{poster.university}</div>}
+            {poster.dept && <div style={{ fontFamily: bf, fontSize: 11, color: acc, marginTop: 2 }}>{poster.dept}</div>}
+            {poster.campus && <div style={{ fontFamily: bf, fontSize: 10, color: `${pri}80`, marginTop: 1 }}>{poster.campus}</div>}
           </div>
         </div>
 
-        {/* Category pill */}
-        <div style={{ display: 'inline-block', background: acc, padding: '4px 14px', borderRadius: 2, marginBottom: 16, alignSelf: 'flex-start' }}>
-          <span style={{ fontFamily: bf, fontSize: 10, fontWeight: 700, color: '#000', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{poster.category}</span>
+        {/* Category */}
+        <div style={{
+          display: 'inline-block',
+          background: acc,
+          padding: '4px 14px',
+          borderRadius: 2,
+          marginBottom: 16,
+          alignSelf: 'flex-start'
+        }}>
+          <span style={{
+            fontFamily: bf,
+            fontSize: 10,
+            fontWeight: 700,
+            color: '#000',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase'
+          }}>
+            {poster.category}
+          </span>
         </div>
 
+        {/* Title */}
         {poster.title
-          ? <div style={{ fontFamily: df, fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.15, marginBottom: 8, paddingRight: 20 }}>{poster.title}</div>
-          : <div style={{ fontSize: 20, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event title appears here</div>
+          ? <div style={{
+              fontFamily: df,
+              fontSize: 28,
+              fontWeight: 700,
+              color: pri,
+              lineHeight: 1.15,
+              marginBottom: 8,
+              paddingRight: 20
+            }}>
+              {poster.title}
+            </div>
+          : <div style={{
+              fontSize: 20,
+              color: `${pri}33`,
+              fontStyle: 'italic',
+              fontFamily: 'Georgia'
+            }}>
+              Event title appears here
+            </div>
         }
-        {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 13, color: acc, fontStyle: 'italic', marginBottom: 12 }}>{poster.subtitle}</div>}
+
+        {poster.subtitle && (
+          <div style={{
+            fontFamily: bf,
+            fontSize: 13,
+            color: acc,
+            fontStyle: 'italic',
+            marginBottom: 12
+          }}>
+            {poster.subtitle}
+          </div>
+        )}
 
         <div style={{ width: 48, height: 2, background: acc, margin: '14px 0' }} />
 
+        {/* Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}><span style={{ color: acc }}>▸</span> {formatDate(poster.date)}{poster.date && poster.time ? ' at ' : ''}{formatTime(poster.time)}</div>}
-          {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}><span style={{ color: acc }}>▸</span> {poster.venue}</div>}
-          {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.6)' }}><span style={{ color: acc }}>▸</span> {poster.audience}</div>}
+          {(poster.date || poster.time) && (
+            <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>
+              <span style={{ color: acc }}>▸</span> {formatDate(poster.date)}{poster.date && poster.time ? ' at ' : ''}{formatTime(poster.time)}
+            </div>
+          )}
+          {poster.venue && (
+            <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>
+              <span style={{ color: acc }}>▸</span> {poster.venue}
+            </div>
+          )}
+          {poster.audience && (
+            <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}99` }}>
+              <span style={{ color: acc }}>▸</span> {poster.audience}
+            </div>
+          )}
         </div>
+
         <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
+
         <div style={{ flex: 1 }} />
       </div>
 
+      {/* Speaker + SDG section */}
       {(poster.sp1name || poster.sp1img) && (
-        <div style={{ padding: '18px 28px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontFamily: bf, fontSize: 9, color: acc, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{poster.sp2name ? 's' : ''}</div>
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
-            {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+        <div style={{
+          padding: '18px 28px',
+          background: 'rgba(0,0,0,0.3)',
+          borderTop: '1px solid rgba(255,255,255,0.08)'
+        }}>
+
+          <div style={{
+            fontFamily: bf,
+            fontSize: 9,
+            color: acc,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            marginBottom: 10
+          }}>
+            Speaker{poster.sp2name ? 's' : ''}
+          </div>
+
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 16,
+          }}>
+
+            {/* LEFT: Speakers */}
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <SpeakerCard
+                img={poster.sp1img}
+                name={poster.sp1name}
+                title={poster.sp1title}
+                alumni={poster.sp1alumni}
+                accent={acc}
+                df={df}
+                bf={bf}
+              />
+
+              {poster.sp2name && (
+                <SpeakerCard
+                  img={poster.sp2img}
+                  name={poster.sp2name}
+                  title={poster.sp2title}
+                  alumni={poster.sp2alumni}
+                  accent={acc}
+                  df={df}
+                  bf={bf}
+                />
+              )}
+            </div>
+
+            {/* RIGHT: SDGs */}
+            {selectedSDGs.length > 0 && (
+              <div style={{
+                display: 'flex',
+                gap: 6,
+                alignItems: 'center',
+              }}>
+                {selectedSDGs.map((sdg) => (
+                  <img
+                    key={sdg.value}
+                    src={sdg.img}
+                    alt={sdg.label}
+                    title={sdg.label}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 3,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
           </div>
         </div>
       )}
+
+      {/* Tagline */}
       {(poster.tagline || poster.reglink) && (
-        <div style={{ padding: '7px 28px', borderTop: `2px solid ${acc}`, textAlign: 'right', background: 'rgba(0,0,0,0.2)' }}>
-          <span style={{ fontFamily: bf, fontSize: 10, color: acc, fontStyle: 'italic' }}>{poster.tagline || poster.reglink}</span>
+        <div style={{
+          padding: '7px 28px',
+          borderTop: `2px solid ${acc}`,
+          textAlign: 'right',
+          background: 'rgba(0,0,0,0.2)'
+        }}>
+          <span style={{
+            fontFamily: bf,
+            fontSize: 10,
+            color: acc,
+            fontStyle: 'italic'
+          }}>
+            {poster.tagline || poster.reglink}
+          </span>
         </div>
       )}
+
     </div>
   );
 }
@@ -161,7 +326,7 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
 // L2 — Split
 // ─────────────────────────────────────────────
 export function L2_Split({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, g } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, g } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
@@ -170,9 +335,9 @@ export function L2_Split({ poster, design, qrDataUrl }) {
         <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 70% 30%,${acc}20,transparent 60%)` }} />
         {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 60, width: 60, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6, marginBottom: 10, position: 'relative' }} />}
         <div style={{ position: 'relative', textAlign: 'center' }}>
-          {poster.university && <div style={{ fontFamily: df, fontSize: 15, fontWeight: 700, color: '#fff' }}>{poster.university}</div>}
+          {poster.university && <div style={{ fontFamily: df, fontSize: 15, fontWeight: 700, color: pri }}>{poster.university}</div>}
           {poster.dept       && <div style={{ fontFamily: bf, fontSize: 11, color: acc, marginTop: 3 }}>{poster.dept}</div>}
-          {poster.campus     && <div style={{ fontFamily: bf, fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{poster.campus}</div>}
+          {poster.campus     && <div style={{ fontFamily: bf, fontSize: 10, color: `${pri}80`, marginTop: 2 }}>{poster.campus}</div>}
         </div>
         <div style={{ marginTop: 16, background: acc, padding: '5px 18px', borderRadius: 20 }}>
           <span style={{ fontFamily: bf, fontSize: 10, fontWeight: 700, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{poster.category}</span>
@@ -183,14 +348,14 @@ export function L2_Split({ poster, design, qrDataUrl }) {
       <div style={{ flex: 1, background: `linear-gradient(160deg,${g[1]},${g[2]})`, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           {poster.title
-            ? <div style={{ fontFamily: df, fontSize: 22, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>{poster.title}</div>
-            : <div style={{ fontSize: 18, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Your event title</div>
+            ? <div style={{ fontFamily: df, fontSize: 22, fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 8 }}>{poster.title}</div>
+            : <div style={{ fontSize: 18, color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Your event title</div>
           }
           {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 12, color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>}
           <div style={{ background: 'rgba(0,0,0,0.22)', borderRadius: 8, padding: 12, marginTop: 10, display: 'flex', flexDirection: 'column', gap: 7, borderLeft: `3px solid ${acc}` }}>
-            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
-            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📍 {poster.venue}</div>}
-            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>👥 {poster.audience}</div>}
+            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
+            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>📍 {poster.venue}</div>}
+            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}A5` }}>👥 {poster.audience}</div>}
           </div>
         </div>
         <div>
@@ -215,7 +380,7 @@ export function L2_Split({ poster, design, qrDataUrl }) {
 // L3 — Band
 // ─────────────────────────────────────────────
 export function L3_Band({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative' }}>
@@ -223,9 +388,9 @@ export function L3_Band({ poster, design, qrDataUrl }) {
       <div style={{ padding: '22px 28px 14px', display: 'flex', alignItems: 'center', gap: 14, marginTop: 7 }}>
         {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 4 }} />}
         <div>
-          {poster.university && <div style={{ fontFamily: df, fontSize: 15, fontWeight: 700, color: '#fff' }}>{poster.university}</div>}
+          {poster.university && <div style={{ fontFamily: df, fontSize: 15, fontWeight: 700, color: pri }}>{poster.university}</div>}
           {poster.dept       && <div style={{ fontFamily: bf, fontSize: 11, color: acc }}>{poster.dept}</div>}
-          {poster.campus     && <div style={{ fontFamily: bf, fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>{poster.campus}</div>}
+          {poster.campus     && <div style={{ fontFamily: bf, fontSize: 10, color: `${pri}80` }}>{poster.campus}</div>}
         </div>
       </div>
       <div style={{ margin: '0 28px', padding: '12px 20px', background: acc, borderRadius: 8, textAlign: 'center' }}>
@@ -245,60 +410,132 @@ export function L3_Band({ poster, design, qrDataUrl }) {
         </div>
         <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
       </div>
-      <SpeakerFooter poster={poster} accent={acc} bf={bf} df={df} />
+      <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
       <div style={{ height: 7, background: acc }} />
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// L4 — Overlay
-// ─────────────────────────────────────────────
 export function L4_Overlay({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const selectedSDGs = (poster.sdgs || [])
+    .map((id) => SDG_OPTIONS.find((s) => s.value === id))
+    .filter(Boolean);
+  const dateTimeStr = [formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ');
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.54)' }} />
       <div style={{ position: 'absolute', bottom: -70, right: -70, width: 300, height: 300, borderRadius: '50%', border: `50px solid ${acc}14` }} />
       <div style={{ position: 'absolute', top: -50, left: -50, width: 220, height: 220, borderRadius: '50%', border: `35px solid ${acc}10` }} />
 
       <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', padding: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22 }}>
-          {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 48, width: 48, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 4 }} />}
-          <div>
-            {poster.university && <div style={{ fontFamily: df, fontSize: 14, fontWeight: 700, color: '#fff' }}>{poster.university}</div>}
-            {poster.dept       && <div style={{ fontFamily: bf, fontSize: 10, color: acc }}>{poster.dept}</div>}
-            {poster.campus     && <div style={{ fontFamily: bf, fontSize: 9, color: 'rgba(255,255,255,0.5)' }}>{poster.campus}</div>}
+        
+        {/* Top Section */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 22 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+            {selectedSDGs.map((sdg) => (
+              <img
+                key={sdg.value}
+                src={sdg.img}
+                alt={sdg.label}
+                title={sdg.label}
+                style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover' }}
+              />
+            ))}
           </div>
+          {poster.logoImg && (
+            <img
+              src={poster.logoImg}
+              alt="logo"
+              style={{ width: 72, height: 72, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6 }}
+            />
+          )}
         </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
-          <div style={{ display: 'inline-block', margin: '0 auto 14px', border: `1.5px solid ${acc}`, padding: '4px 18px', borderRadius: 2 }}>
-            <span style={{ fontFamily: bf, fontSize: 10, color: acc, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700 }}>{poster.category}</span>
+
+        {/* University Section */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 4, marginBottom: 24, padding: '0 24px' }}>
+          {poster.university && <div style={{ fontFamily: df, fontSize: 24, fontWeight: 800, color: pri }}>{poster.university}</div>}
+          {poster.dept && <div style={{ fontFamily: bf, fontSize: 15, fontWeight: 700, color: acc }}>{poster.dept}</div>}
+          {poster.campus && <div style={{ fontFamily: bf, fontSize: 13, color: `${pri}cc` }}>{poster.campus}</div>}
+        </div>
+
+        {/* Main Content */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', justifyContent: 'center', gap: 10, padding: '0 24px' }}>
+          
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${acc}`, padding: '5px 18px', borderRadius: 4, marginBottom: 12 }}>
+            <span style={{ fontFamily: bf, fontSize: 10, fontWeight: 700, color: acc, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+              {poster.category}
+            </span>
           </div>
+
           {poster.title
-            ? <div style={{ fontFamily: df, fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.15, textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>{poster.title}</div>
-            : <div style={{ fontSize: 22, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
+            ? <div style={{ fontFamily: df, fontSize: 24, fontWeight: 800, color: pri }}>{poster.title}</div>
+            : <div style={{ fontFamily: 'Georgia', fontSize: 24, color: `${pri}33`, fontStyle: 'italic' }}>Event Title</div>
           }
-          {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 13, color: acc, fontStyle: 'italic', marginTop: 8 }}>{poster.subtitle}</div>}
-          <div style={{ width: 50, height: 2, background: acc, margin: '16px auto' }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'center' }}>
-            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
-            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📍 {poster.venue}</div>}
-            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>👥 {poster.audience}</div>}
-          </div>
-          <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
+
+          {poster.subtitle && (
+            <div style={{ fontFamily: bf, fontSize: 13, color: acc, fontStyle: 'italic', marginTop: 8 }}>
+              {poster.subtitle}
+            </div>
+          )}
+
+          <div style={{ width: 60, height: 2, background: acc, margin: '16px auto' }} />
         </div>
+
+        {/* Speakers */}
         {(poster.sp1name || poster.sp1img) && (
-          <div style={{ paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontFamily: bf, fontSize: 9, color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 10 }}>Speaker{poster.sp2name ? 's' : ''}</div>
-            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
-              {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, marginTop: 24 }}>
+            <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
+
+              {/* Speaker 1 */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, maxWidth: 220 }}>
+                {poster.sp1img ? (
+                  <img src={poster.sp1img} alt={poster.sp1name} style={{ width: 180, height: 180, borderRadius: '50%' }} />
+                ) : (
+                  <div style={{ width: 180, height: 180, borderRadius: '50%', background: `${acc}22`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
+                )}
+                {poster.sp1name && <div style={{ fontFamily: df, fontSize: 18, fontWeight: 700, color: pri }}>{poster.sp1name}</div>}
+                {poster.sp1title && <div style={{ fontFamily: bf, fontSize: 12, color: acc }}>{poster.sp1title}</div>}
+                {poster.sp1alumni && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}cc` }}>{poster.sp1alumni}</div>}
+              </div>
+
+              {/* Speaker 2 */}
+              {poster.sp2name && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, maxWidth: 220 }}>
+                  {poster.sp2img ? (
+                    <img src={poster.sp2img} alt={poster.sp2name} style={{ width: 180, height: 180, borderRadius: '50%' }} />
+                  ) : (
+                    <div style={{ width: 180, height: 180, borderRadius: '50%', background: `${acc}22`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
+                  )}
+                  {poster.sp2name && <div style={{ fontFamily: df, fontSize: 18, fontWeight: 700, color: pri }}>{poster.sp2name}</div>}
+                  {poster.sp2title && <div style={{ fontFamily: bf, fontSize: 12, color: acc }}>{poster.sp2title}</div>}
+                  {poster.sp2alumni && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}cc` }}>{poster.sp2alumni}</div>}
+                </div>
+              )}
+
             </div>
           </div>
         )}
-        {poster.tagline && <div style={{ marginTop: 14, textAlign: 'center', fontFamily: bf, fontSize: 10, color: acc, fontStyle: 'italic' }}>{poster.tagline}</div>}
+
+        {/* NEW: Bottom Row (Date + Venue) */}
+        {(dateTimeStr || poster.venue) && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginTop: 24 }}>
+            {dateTimeStr && (
+              <div style={{ fontFamily: bf, fontSize: 12, color: pri, padding: '10px 14px', background: 'rgba(255,255,255,0.08)', borderRadius: 12 }}>
+                📅 {dateTimeStr}
+              </div>
+            )}
+            {poster.venue && (
+              <div style={{ fontFamily: bf, fontSize: 12, color: pri, padding: '10px 14px', background: 'rgba(255,255,255,0.08)', borderRadius: 12 }}>
+                📍 {poster.venue}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* QR */}
+        <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
       </div>
     </div>
   );
@@ -310,7 +547,7 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
 const CATEGORY_ICONS = { Workshop: '🛠', Seminar: '🎓', Hackathon: '💻', 'Competitive Exam': '🏆', Conference: '🌐', Webinar: '🖥', FDP: '📋', Symposium: '🎤', 'Skill Enhancement': '💡', 'Guest Lecture': '🎙' };
 
 export function L5_Minimal({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
@@ -319,7 +556,7 @@ export function L5_Minimal({ poster, design, qrDataUrl }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 42, width: 42, objectFit: 'contain', borderRadius: 4, background: '#fff', padding: 3 }} />}
             <div>
-              {poster.university && <div style={{ fontFamily: df, fontSize: 13, fontWeight: 700, color: '#fff' }}>{poster.university}</div>}
+              {poster.university && <div style={{ fontFamily: df, fontSize: 13, fontWeight: 700, color: pri }}>{poster.university}</div>}
               {poster.dept       && <div style={{ fontFamily: bf, fontSize: 10, color: acc }}>{poster.dept}</div>}
             </div>
           </div>
@@ -329,8 +566,8 @@ export function L5_Minimal({ poster, design, qrDataUrl }) {
         </div>
         <div style={{ fontFamily: bf, fontSize: 10, color: acc, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>{poster.category}</div>
         {poster.title
-          ? <div style={{ fontFamily: df, fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1.2, borderLeft: `3px solid ${acc}`, paddingLeft: 14 }}>{poster.title}</div>
-          : <div style={{ fontSize: 20, color: 'rgba(255,255,255,0.2)', borderLeft: '3px solid rgba(255,255,255,0.1)', paddingLeft: 14, fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
+          ? <div style={{ fontFamily: df, fontSize: 26, fontWeight: 700, color: pri, lineHeight: 1.2, borderLeft: `3px solid ${acc}`, paddingLeft: 14 }}>{poster.title}</div>
+          : <div style={{ fontSize: 20, color: `${pri}33`, borderLeft: '3px solid rgba(255,255,255,0.1)', paddingLeft: 14, fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
         }
         {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 8, paddingLeft: 17, fontStyle: 'italic' }}>{poster.subtitle}</div>}
       </div>
@@ -372,7 +609,7 @@ function InfoCard({ label, value, acc, bf, span }) {
 // L6 — Diagonal
 // ─────────────────────────────────────────────
 export function L6_Diagonal({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, g } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, g } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative', overflow: 'hidden', background: g[0] }}>
@@ -384,7 +621,7 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 50, width: 50, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 4 }} />}
             <div>
-              {poster.university && <div style={{ fontFamily: df, fontSize: 14, fontWeight: 700, color: '#fff', textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>{poster.university}</div>}
+              {poster.university && <div style={{ fontFamily: df, fontSize: 14, fontWeight: 700, color: pri, textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>{poster.university}</div>}
               {poster.dept       && <div style={{ fontFamily: bf, fontSize: 10, color: acc, marginTop: 2 }}>{poster.dept}</div>}
             </div>
           </div>
@@ -393,8 +630,8 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
           </div>
         </div>
         {poster.title
-          ? <div style={{ fontFamily: df, fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.15, marginBottom: 8, textShadow: '0 2px 16px rgba(0,0,0,0.4)' }}>{poster.title}</div>
-          : <div style={{ fontSize: 22, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
+          ? <div style={{ fontFamily: df, fontSize: 28, fontWeight: 700, color: pri, lineHeight: 1.15, marginBottom: 8, textShadow: '0 2px 16px rgba(0,0,0,0.4)' }}>{poster.title}</div>
+          : <div style={{ fontSize: 22, color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
         }
         {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 13, color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>}
       </div>
@@ -402,9 +639,9 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
       <div style={{ position: 'relative', zIndex: 1, flex: 1, padding: '16px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: 10, padding: 16, marginBottom: 14 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
-            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📍 {poster.venue}</div>}
-            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>👥 {poster.audience}</div>}
+            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
+            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>📍 {poster.venue}</div>}
+            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}A5` }}>👥 {poster.audience}</div>}
           </div>
         </div>
         {(poster.sp1name || poster.sp1img) && (
@@ -426,7 +663,7 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
 // L7 — Frame
 // ─────────────────────────────────────────────
 export function L7_Frame({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
   const corner = { position: 'absolute', width: 20, height: 20 };
 
   return (
@@ -444,9 +681,9 @@ export function L7_Frame({ poster, design, qrDataUrl }) {
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', padding: 30 }}>
         <div style={{ textAlign: 'center', marginBottom: 16 }}>
           {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 58, width: 58, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 5, marginBottom: 8, display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />}
-          {poster.university && <div style={{ fontFamily: df, fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>{poster.university}</div>}
+          {poster.university && <div style={{ fontFamily: df, fontSize: 16, fontWeight: 700, color: pri, letterSpacing: '0.04em' }}>{poster.university}</div>}
           {poster.dept       && <div style={{ fontFamily: bf, fontSize: 11, color: acc, marginTop: 2, letterSpacing: '0.05em' }}>{poster.dept}</div>}
-          {poster.campus     && <div style={{ fontFamily: bf, fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{poster.campus}</div>}
+          {poster.campus     && <div style={{ fontFamily: bf, fontSize: 10, color: `${pri}80`, marginTop: 2 }}>{poster.campus}</div>}
           <div style={{ width: 80, height: 1, background: `${acc}55`, margin: '14px auto 0' }} />
         </div>
         <div style={{ textAlign: 'center', background: acc, padding: '5px 20px', margin: '0 auto 18px', borderRadius: 2, display: 'inline-block' }}>
@@ -454,14 +691,14 @@ export function L7_Frame({ poster, design, qrDataUrl }) {
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
           {poster.title
-            ? <div style={{ fontFamily: df, fontSize: 25, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: 10 }}>{poster.title}</div>
-            : <div style={{ fontSize: 20, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
+            ? <div style={{ fontFamily: df, fontSize: 25, fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 10 }}>{poster.title}</div>
+            : <div style={{ fontSize: 20, color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
           }
           {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 13, color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
-            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff' }}>📍 {poster.venue}</div>}
-            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>👥 {poster.audience}</div>}
+            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
+            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: pri }}>📍 {poster.venue}</div>}
+            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}99` }}>👥 {poster.audience}</div>}
           </div>
           <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
         </div>
@@ -483,14 +720,14 @@ export function L7_Frame({ poster, design, qrDataUrl }) {
 // L8 — Timeline
 // ─────────────────────────────────────────────
 export function L8_Timeline({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', minHeight: 'inherit' }}>
       {/* Vertical accent bar */}
       <div style={{ width: 8, background: acc, flexShrink: 0, position: 'relative' }}>
         {[30, 50, undefined].map((top, i) => (
-          <div key={i} style={{ position: 'absolute', top: top !== undefined ? top : undefined, bottom: top === undefined ? 30 : undefined, left: '50%', transform: 'translateX(-50%)', width: 16, height: 16, borderRadius: '50%', background: '#fff', border: `3px solid ${acc}` }} />
+          <div key={i} style={{ position: 'absolute', top: top !== undefined ? top : undefined, bottom: top === undefined ? 30 : undefined, left: '50%', transform: 'translateX(-50%)', width: 16, height: 16, borderRadius: '50%', background: pri, border: `3px solid ${acc}` }} />
         ))}
       </div>
 
@@ -498,24 +735,24 @@ export function L8_Timeline({ poster, design, qrDataUrl }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 44, width: 44, objectFit: 'contain', borderRadius: 4, background: '#fff', padding: 3 }} />}
           <div>
-            {poster.university && <div style={{ fontFamily: df, fontSize: 14, fontWeight: 700, color: '#fff' }}>{poster.university}</div>}
+            {poster.university && <div style={{ fontFamily: df, fontSize: 14, fontWeight: 700, color: pri }}>{poster.university}</div>}
             {poster.dept       && <div style={{ fontFamily: bf, fontSize: 10, color: acc }}>{poster.dept}</div>}
-            {poster.campus     && <div style={{ fontFamily: bf, fontSize: 9, color: 'rgba(255,255,255,0.5)' }}>{poster.campus}</div>}
+            {poster.campus     && <div style={{ fontFamily: bf, fontSize: 9, color: `${pri}80` }}>{poster.campus}</div>}
           </div>
         </div>
         <div style={{ background: acc, display: 'inline-block', padding: '4px 14px', borderRadius: 20, marginBottom: 14, alignSelf: 'flex-start' }}>
           <span style={{ fontFamily: bf, fontSize: 10, fontWeight: 700, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{poster.category}</span>
         </div>
         {poster.title
-          ? <div style={{ fontFamily: df, fontSize: 24, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: 6 }}>{poster.title}</div>
-          : <div style={{ fontSize: 18, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
+          ? <div style={{ fontFamily: df, fontSize: 24, fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 6 }}>{poster.title}</div>
+          : <div style={{ fontSize: 18, color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
         }
         {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 12, color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>}
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
-          {(poster.date || poster.time) && <TimelineCard icon="📅" label="Date & Time" value={`${formatDate(poster.date)}${poster.date && poster.time ? ' at ' : ''}${formatTime(poster.time)}`} acc={acc} bf={bf} />}
-          {poster.venue    && <TimelineCard icon="📍" label="Venue"    value={poster.venue}   acc={acc} bf={bf} />}
-          {poster.audience && <TimelineCard icon="👥" label="Audience" value={poster.audience} acc={acc} bf={bf} />}
+          {(poster.date || poster.time) && <TimelineCard icon="📅" label="Date & Time" value={`${formatDate(poster.date)}${poster.date && poster.time ? ' at ' : ''}${formatTime(poster.time)}`} acc={acc} pri={pri} bf={bf} />}
+          {poster.venue    && <TimelineCard icon="📍" label="Venue"    value={poster.venue}   acc={acc} pri={pri} bf={bf} />}
+          {poster.audience && <TimelineCard icon="👥" label="Audience" value={poster.audience} acc={acc} pri={pri} bf={bf} />}
         </div>
 
         {(poster.sp1name || poster.sp1img) && (
@@ -533,13 +770,13 @@ export function L8_Timeline({ poster, design, qrDataUrl }) {
   );
 }
 
-function TimelineCard({ icon, label, value, acc, bf }) {
+function TimelineCard({ icon, label, value, acc, pri, bf }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'rgba(255,255,255,0.07)', borderRadius: 6, borderLeft: `3px solid ${acc}` }}>
       <span style={{ fontSize: 18 }}>{icon}</span>
       <div>
         <div style={{ fontFamily: bf, fontSize: 9, color: acc, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
-        <div style={{ fontFamily: bf, fontSize: 13, color: '#fff' }}>{value}</div>
+        <div style={{ fontFamily: bf, fontSize: 13, color: pri }}>{value}</div>
       </div>
     </div>
   );
@@ -549,7 +786,7 @@ function TimelineCard({ icon, label, value, acc, bf }) {
 // L9 — Typographic
 // ─────────────────────────────────────────────
 export function L9_Typographic({ poster, design, qrDataUrl }) {
-  const { acc, df, bf, g } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, g } = useLayoutProps({ poster, design, qrDataUrl });
   const ghostLetter = poster.category?.[0] || 'E';
 
   return (
@@ -562,7 +799,7 @@ export function L9_Typographic({ poster, design, qrDataUrl }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 42, width: 42, objectFit: 'contain', borderRadius: 4, background: '#fff', padding: 3 }} />}
             <div>
-              {poster.university && <div style={{ fontFamily: bf, fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{poster.university}</div>}
+              {poster.university && <div style={{ fontFamily: bf, fontSize: 12, fontWeight: 700, color: pri, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{poster.university}</div>}
               {poster.dept       && <div style={{ fontFamily: bf, fontSize: 10, color: acc, marginTop: 1, letterSpacing: '0.04em' }}>{poster.dept}</div>}
             </div>
           </div>
@@ -571,15 +808,15 @@ export function L9_Typographic({ poster, design, qrDataUrl }) {
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {poster.title
-            ? <div style={{ fontFamily: df, fontSize: 34, fontWeight: 900, color: '#fff', lineHeight: 1.05, marginBottom: 12, letterSpacing: '-0.01em' }}>{poster.title}</div>
-            : <div style={{ fontSize: 28, fontWeight: 900, color: 'rgba(255,255,255,0.15)', fontFamily: 'Georgia', lineHeight: 1.1 }}>EVENT TITLE</div>
+            ? <div style={{ fontFamily: df, fontSize: 34, fontWeight: 900, color: pri, lineHeight: 1.05, marginBottom: 12, letterSpacing: '-0.01em' }}>{poster.title}</div>
+            : <div style={{ fontSize: 28, fontWeight: 900, color: `${pri}26`, fontFamily: 'Georgia', lineHeight: 1.1 }}>EVENT TITLE</div>
           }
           {poster.subtitle && <div style={{ fontFamily: bf, fontSize: 14, color: acc, fontStyle: 'italic', marginBottom: 20, opacity: 0.9 }}>{poster.subtitle}</div>}
           <div style={{ height: 1, background: `linear-gradient(90deg,${acc},transparent)`, marginBottom: 20, width: '60%' }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {(poster.date || poster.time) && <TypoRow label="When"  value={`${formatDate(poster.date)}${poster.date && poster.time ? ' — ' : ''}${formatTime(poster.time)}`} acc={acc} bf={bf} />}
-            {poster.venue    && <TypoRow label="Where" value={poster.venue}   acc={acc} bf={bf} />}
-            {poster.audience && <TypoRow label="For"   value={poster.audience} acc={acc} bf={bf} dim />}
+            {(poster.date || poster.time) && <TypoRow label="When"  value={`${formatDate(poster.date)}${poster.date && poster.time ? ' — ' : ''}${formatTime(poster.time)}`} acc={acc} pri={pri} bf={bf} />}
+            {poster.venue    && <TypoRow label="Where" value={poster.venue}   acc={acc} pri={pri} bf={bf} />}
+            {poster.audience && <TypoRow label="For"   value={poster.audience} acc={acc} pri={pri} bf={bf} dim />}
           </div>
         </div>
 
@@ -603,11 +840,11 @@ export function L9_Typographic({ poster, design, qrDataUrl }) {
   );
 }
 
-function TypoRow({ label, value, acc, bf, dim }) {
+function TypoRow({ label, value, acc, pri, bf, dim }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <span style={{ fontFamily: bf, fontSize: 10, color: acc, letterSpacing: '0.1em', textTransform: 'uppercase', width: 40, flexShrink: 0 }}>{label}</span>
-      <span style={{ fontFamily: bf, fontSize: 13, color: dim ? 'rgba(255,255,255,0.75)' : '#fff' }}>{value}</span>
+      <span style={{ fontFamily: bf, fontSize: 13, color: dim ? `${pri}BF` : pri }}>{value}</span>
     </div>
   );
 }

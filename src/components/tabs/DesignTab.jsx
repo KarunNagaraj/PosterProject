@@ -1,7 +1,7 @@
 import { useShallow } from 'zustand/react/shallow';
 import { FieldGroup, Select, SectionLabel, Button, UploadBox } from '../UI';
 import {
-  GRADIENTS, ACCENTS, FONT_PAIRS, LAYOUT_NAMES,
+  GRADIENTS, ACCENTS, PRIMARY_COLORS, FONT_PAIRS, LAYOUT_NAMES,
   BG_TYPES, POSTER_SIZES,
 } from '../../constants';
 import { fileToBase64 } from '../../utils';
@@ -73,6 +73,31 @@ function AccentRow({ selected, onChange }) {
   );
 }
 
+// ── Primary colour row ────────────────────────
+function PrimaryRow({ selected, onChange }) {
+  return (
+    <div className={styles.accentRow}>
+      {PRIMARY_COLORS.map(c => (
+        <button
+          key={c}
+          className={[styles.accentSwatch, selected === c && styles.accentSelected].filter(Boolean).join(' ')}
+          style={{ background: c, border: '1px solid rgba(0,0,0,0.2)' }}
+          onClick={() => onChange(c)}
+          title={c}
+        />
+      ))}
+      {/* Custom colour picker */}
+      <input
+        type="color"
+        className={styles.colorPicker}
+        value={selected}
+        onChange={(e) => onChange(e.target.value)}
+        title="Custom colour"
+      />
+    </div>
+  );
+}
+
 // ── Alignment buttons ─────────────────────────
 function AlignRow({ selected, onChange }) {
   return (
@@ -100,6 +125,7 @@ export default function DesignTab() {
     bgcolor,
     bgimg,
     accent,
+    primary,
     font,
     align,
     size,
@@ -112,6 +138,7 @@ export default function DesignTab() {
       bgcolor: state.design.bgcolor,
       bgimg: state.design.bgimg,
       accent: state.design.accent,
+      primary: state.design.primary,
       font: state.design.font,
       align: state.design.align,
       size: state.design.size,
@@ -172,6 +199,12 @@ export default function DesignTab() {
       <AccentRow
         selected={accent}
         onChange={(value) => setDesignField('accent', value)}
+      />
+
+      <SectionLabel>Primary Text Colour</SectionLabel>
+      <PrimaryRow
+        selected={primary}
+        onChange={(value) => setDesignField('primary', value)}
       />
 
       <SectionLabel>Typography</SectionLabel>
