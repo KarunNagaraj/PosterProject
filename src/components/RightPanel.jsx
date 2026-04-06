@@ -1,13 +1,118 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import PosterCanvas from './poster/PosterCanvas';
 import { Button } from './UI';
-import { downloadPoster } from '../utils'; // Changed import
+import { downloadPoster } from '../utils';
 import { usePosterStore } from '../store/usePosterStore';
 import styles from './RightPanel.module.css';
 
+// ── Share Menu Component ─────────────────────────────────────
+// Extensible dropdown menu for sharing options
+function ShareMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Close menu when clicking outside of it
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handlePrint = () => {
+    setIsOpen(false);
+    window.print();
+  };
+
+ const handleEmail = async () => {
+  setIsOpen(false);
+
+  // Step 1: generate the poster as a PNG blob
+  const { domToBlob } = await import('modern-screenshot');
+  const el = document.getElementById('poster-canvas');
+  if (!el) return;
+
+  const blob = await domToBlob(el, {
+    scale: 3,
+    type: 'image/png',
+    style: { transform: 'none', overflow: 'visible' },
+  });
+
+  const file = new File([blob], 'poster.png', { type: 'image/png' });
+
+  // Step 2: use Web Share API if available (mobile + modern desktop)
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        title: 'Event Poster',
+        text: 'Check out this event poster I made!',
+        files: [file],
+      });
+      return;
+    } catch (err) {
+      // User cancelled — do nothing
+      if (err.name === 'AbortError') return;
+    }
+  }
+
+  // Step 3: fallback — just download the file if Web Share isn't available
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'poster.png';
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+  return (
+    <div style={{ position: 'relative' }} ref={menuRef}>
+      <Button variant="ghost" onClick={() => setIsOpen(!isOpen)}>
+        🔗 Share ▾
+      </Button>
+
+      {isOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          right: 0,
+          marginTop: '6px',
+          background: 'var(--bg-panel, rgba(30, 30, 30, 0.95))', // Adapts cleanly
+          border: '1px solid rgba(120, 120, 120, 0.2)',
+          borderRadius: '8px',
+          padding: '6px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2px',
+          minWidth: '140px',
+          zIndex: 100,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          {/* Menu Items */}
+          <Button variant="ghost" onClick={handlePrint} style={{ justifyContent: 'flex-start', width: '100%' }}>
+            ⎙ Print
+          </Button>
+         <Button variant="ghost" onClick={handleEmail} style={{ justifyContent: 'flex-start', width: '100%' }}>
+            ↑ Share
+          </Button>
+                    
+          {/* You can easily add more options here in the future:
+          <Button variant="ghost" onClick={handleTwitterShare} style={{ justifyContent: 'flex-start', width: '100%' }}>
+            🐦 Twitter
+          </Button>
+          */}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main Right Panel ─────────────────────────────────────────
 export default function RightPanel() {
-  // NEW: State to track selected download format
   const [downloadFormat, setDownloadFormat] = useState('png');
 
   const {
@@ -40,12 +145,9 @@ export default function RightPanel() {
   }, [layout, gradient, accent, font]);
 
   const handleDownload = () => {
-    // Use category for dynamic filename, default to 'event' if empty
     const safeCategory = category ? category.toLowerCase().replace(/\s+/g, '-') : 'event';
-    const baseFilename = `poster-${safeCategory}`;
-    
-    // Assuming you have a 'downloadFormat' state from the dropdown ('png', 'jpeg', or 'pdf')
-    downloadPoster('poster-canvas', baseFilename, downloadFormat);
+    const filename = `poster-${safeCategory}`;
+    downloadPoster('poster-canvas', filename, downloadFormat);
   };
 
   return (
@@ -57,7 +159,6 @@ export default function RightPanel() {
           <Button variant="ghost" onClick={randomizeAll}>🎲 Randomize All</Button>
           <Button variant="ghost" onClick={randomizeLayout}>⟳ Layout Only</Button>
           
-          {/* NEW: Format selector and Download Button */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -87,7 +188,8 @@ export default function RightPanel() {
             <Button variant="primary" onClick={handleDownload}>↓ Download</Button>
           </div>
 
-          <Button variant="ghost" onClick={() => window.print()}>⎙ Print</Button>
+          {/* Integrated the new Share Menu here */}
+          <ShareMenu />
         </div>
       </div>
 
