@@ -102,3 +102,7 @@ export async function downloadAsPNG(elementId, filename = 'poster.png') {
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
+// for text sizing feature by user, to maintain consistency across layouts since one variable will be replacing all the different font sizes intitally
+export function scaleFont(size, scale = 1) {
+  return Math.round(size * scale);
+}

@@ -1,6 +1,6 @@
 import { GRADIENTS, SDG_OPTIONS } from '../../../constants';
-import { buildBackground, formatDate, formatTime, getDisplayFont, getBodyFont } from '../../../utils';
-import { SpeakerCard, SpeakerFooter, InfoRow, QRBlock, TaglineBar } from '../PosterParts';
+import { buildBackground, formatDate, formatTime, getDisplayFont, getBodyFont, scaleFont } from '../../../utils';
+import { SpeakerCard, SpeakerFooter, InfoRow, QRBlock, TaglineBar, SDGBlock } from '../PosterParts';
 
 // ── Shared props shape ────────────────────────
 // Each layout receives: { poster, design, qrDataUrl }
@@ -15,15 +15,16 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
   const g   = GRADIENTS[design.gradient];
   const dateTimeStr = [formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ');
   const showQR = poster.showQR && !!qrDataUrl;
+  const textScale = design.textScale || { primary: 1, secondary: 1 };
 
-  return { acc, pri, al, df, bf, bg, g, dateTimeStr, showQR };
+  return { acc, pri, al, df, bf, bg, g, dateTimeStr, showQR, textScale };
 }
 
 // ─────────────────────────────────────────────
 // L0 — Classic
 // ─────────────────────────────────────────────
 export function L0_Classic({ poster, design, qrDataUrl }) {
-  const { acc, pri, al, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, al, df, bf, bg, textScale} = useLayoutProps({ poster, design, qrDataUrl });
   const alignStyle = { textAlign: al };
  const isManualLogo = design.logoMode === 'manual';
 
@@ -65,9 +66,9 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
             />
           </div>
         )}
-        {poster.university && <div style={{ fontFamily: df, fontSize: 17, fontWeight: 700, color: pri, letterSpacing: '0.04em' }}>{poster.university}</div>}
-        {poster.dept       && <div style={{ fontFamily: bf, fontSize: 12, color: acc, marginTop: 2, fontWeight: 600, letterSpacing: '0.05em' }}>{poster.dept}</div>}
-        {poster.campus     && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}99`, marginTop: 2 }}>{poster.campus}</div>}
+        {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(17, textScale.primary), fontWeight: 700, color: pri, letterSpacing: '0.04em' }}>{poster.university}</div>}
+        {poster.dept       && <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, marginTop: 2, fontWeight: 600, letterSpacing: '0.05em' }}>{poster.dept}</div>}
+        {poster.campus     && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}99`, marginTop: 2 }}>{poster.campus}</div>}
       </div>
 
       {/* Category band */}
@@ -102,10 +103,7 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
 export function L1_Editorial({ poster, design, qrDataUrl }) {
   const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
 
-  // Prepare SDGs cleanly
-  const selectedSDGs = (poster.sdgs || [])
-    .map(id => SDG_OPTIONS.find(s => s.value === id))
-    .filter(Boolean);
+  
 
   return (
     <div style={{
@@ -273,27 +271,7 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
             </div>
 
             {/* RIGHT: SDGs */}
-            {selectedSDGs.length > 0 && (
-              <div style={{
-                display: 'flex',
-                gap: 6,
-                alignItems: 'center',
-              }}>
-                {selectedSDGs.map((sdg) => (
-                  <img
-                    key={sdg.value}
-                    src={sdg.img}
-                    alt={sdg.label}
-                    title={sdg.label}
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 3,
-                    }}
-                  />
-                ))}
-              </div>
-            )}
+         <SDGBlock sdgs={poster.sdgs} size={30} />
 
           </div>
         </div>
@@ -418,9 +396,7 @@ export function L3_Band({ poster, design, qrDataUrl }) {
 
 export function L4_Overlay({ poster, design, qrDataUrl }) {
   const { acc, pri, df, bf, bg } = useLayoutProps({ poster, design, qrDataUrl });
-  const selectedSDGs = (poster.sdgs || [])
-    .map((id) => SDG_OPTIONS.find((s) => s.value === id))
-    .filter(Boolean);
+  
   const dateTimeStr = [formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ');
 
   return (
@@ -434,15 +410,7 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
         {/* Top Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 22 }}>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-            {selectedSDGs.map((sdg) => (
-              <img
-                key={sdg.value}
-                src={sdg.img}
-                alt={sdg.label}
-                title={sdg.label}
-                style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover' }}
-              />
-            ))}
+            <SDGBlock sdgs={poster.sdgs} size={30} />
           </div>
           {poster.logoImg && (
             <img

@@ -160,4 +160,8 @@ export const DEFAULT_DESIGN = {
   size: 'a4',
   logoMode: 'auto',
   logoX: 0,
+  textScale: {
+  primary: 1,     // headings
+  secondary: 1,   // subtitles, metadata
+}
 };

@@ -8,6 +8,7 @@ import { fileToBase64 } from '../../utils';
 import { usePosterStore } from '../../store/usePosterStore';
 import styles from './DesignTab.module.css';
 
+
 // ── Layout thumbnail grid ─────────────────────
 function LayoutGrid({ selected, onChange }) {
   return (
@@ -129,6 +130,7 @@ export default function DesignTab() {
     font,
     align,
     size,
+    textScale,
     setDesignField,
   } = usePosterStore(
     useShallow((state) => ({
@@ -142,6 +144,7 @@ export default function DesignTab() {
       font: state.design.font,
       align: state.design.align,
       size: state.design.size,
+      textScale: state.design.textScale,
       setDesignField: state.setDesignField,
     }))
   );
@@ -215,6 +218,39 @@ export default function DesignTab() {
           options={FONT_PAIRS}
         />
       </FieldGroup>
+      <SectionLabel>Text Size</SectionLabel>
+
+<FieldGroup label="Primary (Headings)">
+  <input
+    type="range"
+    min="0.7"
+    max="1.5"
+    step="0.05"
+    value={textScale?.primary || 1}
+    onChange={(e) =>
+      setDesignField('textScale', {
+        ...(textScale || {}),
+        primary: parseFloat(e.target.value)
+      })
+    }
+  />
+</FieldGroup>
+
+<FieldGroup label="Secondary (Details)">
+  <input
+    type="range"
+    min="0.7"
+    max="1.5"
+    step="0.05"
+    value={textScale?.secondary || 1}
+    onChange={(e) =>
+      setDesignField('textScale', {
+        ...(textScale || {}),
+        secondary: parseFloat(e.target.value)
+      })
+    }
+  />
+</FieldGroup>
 
       <SectionLabel>Text Alignment</SectionLabel>
       <AlignRow

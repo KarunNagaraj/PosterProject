@@ -36,6 +36,7 @@ export const usePosterStore = create((set) => ({
         [key]: value,
       },
     })),
+    
 
   applyCategoryTheme: (category) => {
     const theme = CATEGORY_THEMES[category];

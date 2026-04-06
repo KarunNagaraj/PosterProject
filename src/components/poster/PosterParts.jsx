@@ -1,3 +1,4 @@
+import { SDG_OPTIONS } from '../../constants';
 // ── SpeakerCard ───────────────────────────────
 export function SpeakerCard({ img, name, title, alumni, accent, df, bf, size = 52 }) {
   if (!name && !img) return null;
@@ -111,6 +112,41 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
           <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={accent} df={df} bf={bf} />
         )}
       </div>
+    </div>
+  );
+}
+
+
+// ── SDG BLOCK ───────────────────────────────
+export function SDGBlock({ sdgs = [], size = 32, gap = 6, align = 'flex-start' }) {
+  const selected = sdgs
+    .map(id => SDG_OPTIONS.find(s => s.value === id))
+    .filter(Boolean);
+
+  if (!selected.length) return null;
+
+  return (
+    <div style={{
+      display: 'flex',
+      gap,
+      alignItems: 'center',
+      justifyContent: align,
+      flexWrap: 'wrap'
+    }}>
+      {selected.map((sdg) => (
+        <img
+          key={sdg.value}
+          src={sdg.img}
+          alt={sdg.label}
+          title={sdg.label}
+          style={{
+            width: size,
+            height: size,
+            borderRadius: 4,
+            objectFit: 'cover'
+          }}
+        />
+      ))}
     </div>
   );
 }
