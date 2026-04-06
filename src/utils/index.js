@@ -1,3 +1,4 @@
+import { jsPDF } from 'jspdf';
 import { GRADIENTS } from '../constants';
 
 // ── Date / Time Formatters ────────────────────
@@ -23,6 +24,10 @@ export function getDisplayFont(font) {
 
 export function getBodyFont(font) {
   return font.split('|')[1];
+}
+
+export function scaleFont(size, scale = 1) {
+  return Math.round(size * scale);
 }
 
 // ── Background CSS String ─────────────────────
@@ -86,23 +91,78 @@ export async function generateQRDataUrl(text) {
   }
 }
 
-// ── html2canvas PNG download ──────────────────
-export async function downloadAsPNG(elementId, filename = 'poster.png') {
+// ── Multi-Format Export via modern-screenshot ────────────────
+export async function downloadPoster(elementId, baseFilename = 'poster', format = 'png') {
   const el = document.getElementById(elementId);
   if (!el) return;
-  const html2canvas = (await import('html2canvas')).default;
-  const canvas = await html2canvas(el, {
-    scale: 2.5,
-    useCORS: true,
-    backgroundColor: null,
-    logging: false,
-  });
+
+  try {
+    // Dynamically import modern-screenshot
+    const { domToPng, domToJpeg } = await import('modern-screenshot');
+
+    // Measure the natural size of the poster (ignoring RightPanel CSS scales)
+    const naturalW = el.offsetWidth;
+    const naturalH = el.offsetHeight;
+
+    // Shared configuration to guarantee exact 1:1 color & layout parity
+    const options = {
+      scale: 3, // 3x render scale for print-ready crispness
+      width: naturalW,
+      height: naturalH,
+      backgroundColor: null,
+      filter: (node) => {
+        if (node.nodeType !== 1) return true;
+        const domEl = /** @type {HTMLElement} */ (node);
+        // Clean up UI handles so they don't print
+        if (domEl.title === 'Drag to resize') return false;
+        if (domEl.style?.pointerEvents === 'none' && domEl.style?.position === 'absolute' && domEl.style?.top === '-18px') return false;
+        return true;
+      },
+      style: {
+        transform: 'none',
+        overflow: 'visible', // Prevents edge clipping
+      },
+    };
+
+    const filename = `${baseFilename}.${format}`;
+
+    // ── PDF Generation ──
+    if (format === 'pdf') {
+      // Always use PNG inside the PDF to prevent lossy JPEG compression from destroying gradient quality
+      const dataUrl = await domToPng(el, options);
+      
+      const pdf = new jsPDF({
+        orientation: naturalW > naturalH ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [naturalW, naturalH]
+      });
+      
+      // Inject the 3x resolution PNG into the 1x sized PDF container (creates a high-DPI PDF)
+      pdf.addImage(dataUrl, 'PNG', 0, 0, naturalW, naturalH);
+      pdf.save(filename);
+    } 
+    // ── JPEG Generation ──
+    else if (format === 'jpeg') {
+      // Force quality to 1.0 (100%) for JPEGs to minimize artifacts
+      const dataUrl = await domToJpeg(el, { ...options, quality: 1.0 });
+      triggerDownload(dataUrl, filename);
+    } 
+    // ── PNG Generation ──
+    else {
+      const dataUrl = await domToPng(el, options);
+      triggerDownload(dataUrl, filename);
+    }
+
+  } catch (err) {
+    console.error('Failed to generate poster download:', err);
+    alert('There was an issue generating your poster. Please try again.');
+  }
+}
+
+// Small helper to trigger the browser download behavior
+function triggerDownload(dataUrl, filename) {
   const link = document.createElement('a');
   link.download = filename;
-  link.href = canvas.toDataURL('image/png');
+  link.href = dataUrl;
   link.click();
-}
-// for text sizing feature by user, to maintain consistency across layouts since one variable will be replacing all the different font sizes intitally
-export function scaleFont(size, scale = 1) {
-  return Math.round(size * scale);
 }

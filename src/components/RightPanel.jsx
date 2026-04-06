@@ -1,12 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import PosterCanvas from './poster/PosterCanvas';
 import { Button } from './UI';
-import { downloadAsPNG } from '../utils';
+import { downloadPoster } from '../utils'; // Changed import
 import { usePosterStore } from '../store/usePosterStore';
 import styles from './RightPanel.module.css';
 
 export default function RightPanel() {
+  // NEW: State to track selected download format
+  const [downloadFormat, setDownloadFormat] = useState('png');
+
   const {
     category,
     layout,
@@ -37,8 +40,12 @@ export default function RightPanel() {
   }, [layout, gradient, accent, font]);
 
   const handleDownload = () => {
-    const filename = `poster-${category.toLowerCase().replace(/\s+/g, '-')}.png`;
-    downloadAsPNG('poster-canvas', filename);
+    // Use category for dynamic filename, default to 'event' if empty
+    const safeCategory = category ? category.toLowerCase().replace(/\s+/g, '-') : 'event';
+    const baseFilename = `poster-${safeCategory}`;
+    
+    // Assuming you have a 'downloadFormat' state from the dropdown ('png', 'jpeg', or 'pdf')
+    downloadPoster('poster-canvas', baseFilename, downloadFormat);
   };
 
   return (
@@ -49,7 +56,37 @@ export default function RightPanel() {
         <div className={styles.toolbarRight}>
           <Button variant="ghost" onClick={randomizeAll}>🎲 Randomize All</Button>
           <Button variant="ghost" onClick={randomizeLayout}>⟳ Layout Only</Button>
-          <Button variant="primary" onClick={handleDownload}>↓ Download PNG</Button>
+          
+          {/* NEW: Format selector and Download Button */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            background: 'rgba(120, 120, 120, 0.1)', 
+            padding: '2px', 
+            borderRadius: '6px',
+            border: '1px solid rgba(120, 120, 120, 0.2)'
+          }}>
+            <select 
+              value={downloadFormat} 
+              onChange={(e) => setDownloadFormat(e.target.value)}
+              style={{ 
+                background: 'transparent', 
+                color: 'inherit', 
+                border: 'none', 
+                padding: '0 10px', 
+                outline: 'none', 
+                cursor: 'pointer', 
+                fontFamily: 'inherit',
+                fontSize: '13px'
+              }}
+            >
+              <option value="png" style={{ color: '#000' }}>PNG</option>
+              <option value="jpeg" style={{ color: '#000' }}>JPEG</option>
+              <option value="pdf" style={{ color: '#000' }}>PDF</option>
+            </select>
+            <Button variant="primary" onClick={handleDownload}>↓ Download</Button>
+          </div>
+
           <Button variant="ghost" onClick={() => window.print()}>⎙ Print</Button>
         </div>
       </div>

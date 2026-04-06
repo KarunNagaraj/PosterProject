@@ -91,7 +91,14 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
         <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
       </div>
 
-      <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
+      <div style={{ position: 'relative' }}>
+        <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
+        {(poster.sp1name || poster.sp1img) && (
+          <div style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)' }}>
+            <SDGBlock sdgs={poster.sdgs} size={30} />
+          </div>
+        )}
+      </div>
       <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} bf={bf} />
     </div>
   );
@@ -338,9 +345,12 @@ export function L2_Split({ poster, design, qrDataUrl }) {
           {(poster.sp1name || poster.sp1img) && (
             <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
               <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{poster.sp2name ? 's' : ''}</div>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
-                {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
+                  {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+                </div>
+                <SDGBlock sdgs={poster.sdgs} size={30} />
               </div>
             </div>
           )}
@@ -386,7 +396,14 @@ export function L3_Band({ poster, design, qrDataUrl }) {
         </div>
         <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
       </div>
-      <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
+      <div style={{ position: 'relative' }}>
+        <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
+        {(poster.sp1name || poster.sp1img) && (
+          <div style={{ position: 'absolute', right: 28, top: '50%', transform: 'translateY(-50%)' }}>
+            <SDGBlock sdgs={poster.sdgs} size={30} />
+          </div>
+        )}
+      </div>
       <div style={{ height: 7, background: acc }} />
     </div>
   );
@@ -547,9 +564,12 @@ export function L5_Minimal({ poster, design, qrDataUrl }) {
         </div>
         {(poster.sp1name || poster.sp1img) && (
           <div style={{ paddingTop: 14, borderTop: '0.5px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
-              {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
+                {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+              </div>
+              <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
           </div>
         )}
@@ -611,9 +631,12 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
           </div>
         </div>
         {(poster.sp1name || poster.sp1img) && (
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
-            <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
-            {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
+              {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+            </div>
+            <SDGBlock sdgs={poster.sdgs} size={30} />
           </div>
         )}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 12 }}>
@@ -671,9 +694,15 @@ export function L7_Frame({ poster, design, qrDataUrl }) {
         {(poster.sp1name || poster.sp1img) && (
           <div style={{ paddingTop: 14, borderTop: `1px solid ${acc}30` }}>
             <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 10 }}>Speaker{poster.sp2name ? 's' : ''}</div>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
-              {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+              <div style={{ flex: 1 }} />
+              <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} />
+                {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} />}
+              </div>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                <SDGBlock sdgs={poster.sdgs} size={30} />
+              </div>
             </div>
           </div>
         )}
@@ -724,9 +753,12 @@ export function L8_Timeline({ poster, design, qrDataUrl }) {
         {(poster.sp1name || poster.sp1img) && (
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
             <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{poster.sp2name ? 's' : ''}</div>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} size={44} />
-              {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} size={44} />}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} size={44} />
+                {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} size={44} />}
+              </div>
+              <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
           </div>
         )}
@@ -791,9 +823,12 @@ export function L9_Typographic({ poster, design, qrDataUrl }) {
             {(poster.sp1name || poster.sp1img) && (
               <div style={{ marginTop: 16 }}>
                 <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Speaker{poster.sp2name ? 's' : ''}</div>
-                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                  <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} size={44} />
-                  {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} size={44} />}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+                  <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                    <SpeakerCard img={poster.sp1img} name={poster.sp1name} title={poster.sp1title} alumni={poster.sp1alumni} accent={acc} df={df} bf={bf} size={44} />
+                    {poster.sp2name && <SpeakerCard img={poster.sp2img} name={poster.sp2name} title={poster.sp2title} alumni={poster.sp2alumni} accent={acc} df={df} bf={bf} size={44} />}
+                  </div>
+                  <SDGBlock sdgs={poster.sdgs} size={30} />
                 </div>
               </div>
             )}
