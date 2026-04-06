@@ -47,25 +47,24 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
       {/* Header */}
       <div style={{ position: 'relative',background: 'rgba(0,0,0,0.38)', padding: '22px 24px', ...alignStyle, borderBottom: `3px solid ${acc}` }}>
-        {poster.logoImg && (
-          <div style={{ height: 64, position: 'relative' }}>
-            <img
-              data-type="logo"
-              src={poster.logoImg}
-              alt="logo"
-              style={{
-                height: 56,
-                width: 56,
-                objectFit: 'contain',
-                borderRadius: '50%',
-                background: '#fff',
-                padding: 4,
-                display: 'block',
-                ...logoStyle
-              }}
-            />
-          </div>
-        )}
+              {poster.logoImg && (
+              <div style={{ height: 64, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <img
+                  data-type="logo"
+                  src={poster.logoImg}
+                  alt="logo"
+                  style={{
+                    height: 56, // Keep height consistent
+                    width: 'auto', // Let horizontal logos breathe!
+                    maxWidth: 160, // Stop it from stretching too far
+                    objectFit: 'contain',
+                    display: 'block',
+                    filter: 'drop-shadow(0px 4px 12px rgba(0,0,0,0.5))', // Makes it pop cleanly
+                    ...logoStyle
+                  }}
+                />
+              </div>
+            )}
         {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(17, textScale.primary), fontWeight: 700, color: pri, letterSpacing: '0.04em' }}>{poster.university}</div>}
         {poster.dept       && <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, marginTop: 2, fontWeight: 600, letterSpacing: '0.05em' }}>{poster.dept}</div>}
         {poster.campus     && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}99`, marginTop: 2 }}>{poster.campus}</div>}
@@ -416,7 +415,10 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.54)' }} />
+      {/* Only show the darkening overlay if the background is an image */}
+      {design.bgtype === 'image' && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.54)' }} />
+      )}
       <div style={{ position: 'absolute', bottom: -70, right: -70, width: 300, height: 300, borderRadius: '50%', border: `50px solid ${acc}14` }} />
       <div style={{ position: 'absolute', top: -50, left: -50, width: 220, height: 220, borderRadius: '50%', border: `35px solid ${acc}10` }} />
 
@@ -428,12 +430,23 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
             <SDGBlock sdgs={poster.sdgs} size={30} />
           </div>
           {poster.logoImg && (
-            <img
-              src={poster.logoImg}
-              alt="logo"
-              style={{ width: 72, height: 72, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6 }}
-            />
-          )}
+              <div style={{ height: 64, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <img
+                  data-type="logo"
+                  src={poster.logoImg}
+                  alt="logo"
+                  style={{
+                    height: 56, // Keep height consistent
+                    width: 'auto', // Let horizontal logos breathe!
+                    maxWidth: 160, // Stop it from stretching too far
+                    objectFit: 'contain',
+                    display: 'block',
+                    filter: 'drop-shadow(0px 4px 12px rgba(0,0,0,0.5))', // Makes it pop cleanly
+                    
+                  }}
+                />
+              </div>
+            )}
         </div>
 
         {/* University Section */}
@@ -519,6 +532,7 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
 
         {/* QR */}
         <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
+        <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} primary={pri} />
       </div>
     </div>
   );

@@ -76,12 +76,12 @@ export function QRBlock({ showQR, qrDataUrl, bf }) {
 }
 
 // ── TaglineBar ────────────────────────────────
-export function TaglineBar({ tagline, reglink, accent, bf }) {
+export function TaglineBar({ tagline, reglink, accent, bf, primary }) {
   const text = tagline || reglink;
   if (!text) return null;
   return (
-    <div style={{ background: accent, padding: '7px 24px', textAlign: 'center' }}>
-      <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: '#000' }}>
+    <div style={{ padding: '7px 24px', textAlign: 'center' }}>
+      <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: primary }}>
         {text}
       </span>
     </div>
