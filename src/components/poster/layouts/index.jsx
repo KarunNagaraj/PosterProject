@@ -362,45 +362,87 @@ export function L2_Split({ poster, design, qrDataUrl }) {
 }
 
 // ─────────────────────────────────────────────
-// L3 — Band
+// L3 — Band (Now completely Draggable!)
 // ─────────────────────────────────────────────
 export function L3_Band({ poster, design, qrDataUrl }) {
   const { acc, pri, df, bf, bg, textScale } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
-    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative' }}>
+    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 7, background: acc }} />
+      
+      {/* Header Info */}
       <div style={{ padding: '22px 28px 14px', display: 'flex', alignItems: 'center', gap: 14, marginTop: 7 }}>
-        {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 4 }} />}
-        <div>
-          {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(15, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div>}
-          {poster.dept       && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc }}>{poster.dept}</div>}
-          {poster.campus     && <div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: `${pri}80` }}>{poster.campus}</div>}
-        </div>
-      </div>
-      <div style={{ margin: '0 28px', padding: '12px 20px', background: acc, borderRadius: 8, textAlign: 'center' }}>
-        <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{poster.category}</span>
-      </div>
-      <div style={{ padding: '22px 28px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
-        {poster.title
-          ? <div style={{ fontFamily: df, fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>{poster.title}</div>
-          : <div style={{ fontSize: 20, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
-        }
-        {poster.subtitle && <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>}
-        <div style={{ width: 60, height: 2, background: acc, margin: '12px auto' }} />
-        <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 8, alignItems: 'center', margin: '0 auto' }}>
-          {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 13, color: '#fff', background: 'rgba(0,0,0,0.22)', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
-          {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff', background: 'rgba(0,0,0,0.22)', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>📍 {poster.venue}</div>}
-          {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>For: {poster.audience}</div>}
-        </div>
-        <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
-      </div>
-      <div style={{ position: 'relative' }}>
-        <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
-        {(poster.sp1name || poster.sp1img) && (
-          <div style={{ position: 'absolute', right: 28, top: '50%', transform: 'translateY(-50%)' }}>
-            <SDGBlock sdgs={poster.sdgs} size={30} />
+        {poster.logoImg && (
+          <DraggableItem>
+            <img src={poster.logoImg} alt="logo" style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 4 }} />
+          </DraggableItem>
+        )}
+        <DraggableItem>
+          <div>
+            {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(15, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div>}
+            {poster.dept       && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc }}>{poster.dept}</div>}
+            {poster.campus     && <div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: `${pri}80` }}>{poster.campus}</div>}
           </div>
+        </DraggableItem>
+      </div>
+
+      {/* Category Pill */}
+      <DraggableItem>
+        <div style={{ margin: '0 28px', padding: '12px 20px', background: acc, borderRadius: 8, textAlign: 'center' }}>
+          <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{poster.category}</span>
+        </div>
+      </DraggableItem>
+
+      {/* Main Body */}
+      <div style={{ padding: '22px 28px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
+        
+        <DraggableItem>
+          {poster.title
+            ? <div style={{ fontFamily: df, fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>{poster.title}</div>
+            : <div style={{ fontSize: 20, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
+          }
+        </DraggableItem>
+
+        {poster.subtitle && (
+          <DraggableItem>
+            <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>
+          </DraggableItem>
+        )}
+
+        <DraggableItem>
+          <div style={{ width: 60, height: 2, background: acc, margin: '12px auto' }} />
+        </DraggableItem>
+
+        <DraggableItem>
+          <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 8, alignItems: 'center', margin: '0 auto' }}>
+            {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 13, color: '#fff', background: 'rgba(0,0,0,0.22)', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
+            {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff', background: 'rgba(0,0,0,0.22)', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>📍 {poster.venue}</div>}
+            {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>For: {poster.audience}</div>}
+          </div>
+        </DraggableItem>
+
+        <DraggableItem>
+          <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
+        </DraggableItem>
+      </div>
+
+      {/* Footer */}
+      <div style={{ position: 'relative' }}>
+        <DraggableItem>
+          <SpeakerFooter poster={poster} accent={acc} primary={pri} bf={bf} df={df} />
+        </DraggableItem>
+        
+        {(poster.sp1name || poster.sp1img) && (
+          
+            <div style={{ position: 'absolute', right: 28, top: '50%', transform: 'translateY(-50%)',zIndex: 10 }}>
+              <DraggableItem>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
+              <SDGBlock sdgs={poster.sdgs} size={30} />
+              </div>
+              </DraggableItem>
+            </div>
+          
         )}
       </div>
       <div style={{ height: 7, background: acc }} />
@@ -876,4 +918,50 @@ function parse(cssStr) {
     style[key] = vals.join(':').trim();
   });
   return style;
+}
+import { useState, useRef } from 'react';
+
+// ── Drag & Drop Wrapper ─────────────────────────────────────
+function DraggableItem({ children }) {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const startPos = useRef({ x: 0, y: 0 });
+
+  const onPointerDown = (e) => {
+    setIsDragging(true);
+    // Calculate where inside the element the user clicked
+    startPos.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+    e.target.setPointerCapture(e.pointerId);
+    e.stopPropagation(); // Prevents parent drags if nested
+  };
+
+  const onPointerMove = (e) => {
+    if (!isDragging) return;
+    setPos({
+      x: e.clientX - startPos.current.x,
+      y: e.clientY - startPos.current.y,
+    });
+  };
+
+  const onPointerUp = (e) => {
+    setIsDragging(false);
+    e.target.releasePointerCapture(e.pointerId);
+  };
+
+  return (
+    <div
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      style={{
+        transform: `translate(${pos.x}px, ${pos.y}px)`,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        display: 'inline-block',
+        touchAction: 'none', // Prevents screen scrolling on mobile while dragging
+        zIndex: isDragging ? 50 : 1, // Brings the dragged item to the front
+      }}
+    >
+      {children}
+    </div>
+  );
 }
