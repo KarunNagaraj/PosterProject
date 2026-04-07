@@ -5,6 +5,7 @@ import { Button } from './UI';
 import { downloadPoster } from '../utils';
 import { usePosterStore } from '../store/usePosterStore';
 import styles from './RightPanel.module.css';
+import LoadButton from './right-panel/LoadButton';
 import SaveButton from './right-panel/SaveButton';
 import ToolbarAuth from './right-panel/ToolbarAuth';
 
@@ -171,6 +172,7 @@ export default function RightPanel() {
               <Button variant="primary" className={[styles.actionButton, styles.downloadButton].join(' ')} onClick={handleDownload}>
                 Download
               </Button>
+              <LoadButton />
               <SaveButton />
               <ShareMenu />
             </div>

@@ -197,6 +197,10 @@
   border-color: transparent;
 }
 
+.loadButton {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 .shareMenu {
   position: relative;
 }
@@ -222,6 +226,94 @@
 .shareItem {
   width: 100%;
   justify-content: flex-start;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 18, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 300;
+}
+
+.modalCard {
+  width: min(680px, 100%);
+  max-height: 80vh;
+  overflow: auto;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(18, 22, 38, 0.98), rgba(10, 12, 22, 0.98));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  padding: 18px;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text1);
+}
+
+.savedPosterList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.savedPosterItem {
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text1);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.savedPosterItem:hover {
+  transform: translateY(-1px);
+  border-color: rgba(122, 103, 255, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.savedPosterItem:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.savedPosterName {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.savedPosterMeta {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.emptyState,
+.errorState {
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text2);
+}
+
+.errorState {
+  color: #ffb4b4;
 }
 
 .previewArea {
