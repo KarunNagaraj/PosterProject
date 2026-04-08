@@ -21,15 +21,19 @@ export default function LoadButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (!isOpen || !isSignedIn) return;
+  if (!isOpen || !isSignedIn || !isLoaded) return;
 
-    (async () => {
-      const token = await getToken();
-      if (token) {
-        await fetchSavedPosters(token);
-      }
-    })();
-  }, [isOpen, isSignedIn, getToken, fetchSavedPosters]);
+  (async () => {
+    const token = await getToken();
+
+    if (!token) {
+      console.log("Token not ready yet");
+      return;
+    }
+
+    await fetchSavedPosters(token);
+  })();
+}, [isOpen, isSignedIn, isLoaded, getToken, fetchSavedPosters]);
 
   const handleLoad = async (posterId) => {
     if (hasUnsavedChanges) {
