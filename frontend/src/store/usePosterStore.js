@@ -165,7 +165,7 @@ export const usePosterStore = create((set, get) => ({
     set({ isFetchingPosters: true, savedPostersError: null });
 
     try {
-      const response = await fetch('http://localhost:5000/api/posters', {
+      const response = await fetch('/api/posters', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -189,7 +189,7 @@ export const usePosterStore = create((set, get) => ({
     set({ isLoadingPoster: true, savedPostersError: null });
 
     try {
-      const response = await fetch(`http://localhost:5000/api/posters/${posterId}`, {
+      const response = await fetch(`/api/posters/${posterId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -217,7 +217,7 @@ export const usePosterStore = create((set, get) => ({
     try {
       const { poster, design } = get();
 
-      const response = await fetch('http://localhost:5000/api/posters', {
+      const response = await fetch('/api/posters', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,6 +4,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { clerkMiddleware, requireAuth } from '@clerk/express';
 import Poster from './models/Poster.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -101,6 +106,13 @@ app.post('/api/posters', requireAuth(), async (req, res) => {
   }
 });
 
+// Serve frontend
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Fallback
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 // Start the server
 app.listen(PORT, () => {
