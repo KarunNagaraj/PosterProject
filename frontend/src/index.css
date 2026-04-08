@@ -38,4 +38,8 @@ html, body, #root { height: 100%; font-family: 'Segoe UI', system-ui, -apple-sys
 ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
 @keyframes posterFlash { 0% { opacity: 0.5; transform: scale(0.97); } 100% { opacity: 1; transform: scale(1); } }
 .poster-flash { animation: posterFlash 0.35s ease-out; }
-@media print { body > * { display: none !important; } #poster-canvas { display: block !important; width: 100% !important; } }
+@media print {
+  body > * { display: none !important; }
+  #poster-canvas { display: block !important; width: 100% !important; }
+  [data-editor-chrome="true"] { display: none !important; }
+}

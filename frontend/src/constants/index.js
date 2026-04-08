@@ -135,21 +135,31 @@ export const DEFAULT_STATE = {
   reglink: '',
   showQR: false,
   // Speakers
-  sp1name: 'Dr. Rajesh Kumar',
-  sp1title: "Associate Professor, IIT Madras",
-  sp1alumni: "B.E. CSE '08",
-  sp1img: null,
-  sp2name: '',
-  sp2title: '',
-  sp2alumni: '',
-  sp2img: null,
+  speakers: [
+    {
+      id: 'speaker-1',
+      role: 'Resource Person',
+      name: 'Dr. Rajesh Kumar',
+      title: 'Associate Professor, IIT Madras',
+      details: "B.E. CSE '08",
+      img: null,
+    },
+    {
+      id: 'speaker-2',
+      role: '',
+      name: '',
+      title: '',
+      details: '',
+      img: null,
+    },
+  ],
   sdgs: [],
 };
 
 // ── Default design state ──────────────────────
 export const DEFAULT_DESIGN = {
   layout: 0,
-  bgtype: 'gradient',
+  bgtype: 'solid',
   gradient: 2,
   bgcolor: '#1e3a5f',
   bgimg: null,
@@ -158,8 +168,8 @@ export const DEFAULT_DESIGN = {
   font: 'Georgia,serif|Trebuchet MS,sans-serif',
   align: 'center',
   size: 'a4',
-  logoMode: 'auto',
-  logoX: 0,
+  movableElementsByLayout: {},
+  customTextboxes: [],
   textScale: {
   primary: 1,     // headings
   secondary: 1,   // subtitles, metadata

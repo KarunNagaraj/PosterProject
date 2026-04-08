@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { FieldGroup, Select, SectionLabel, Button, UploadBox } from '../UI';
+import { FieldGroup, Select, SectionLabel, Button, UploadBox, TextInput } from '../UI';
 import {
   GRADIENTS, ACCENTS, PRIMARY_COLORS, FONT_PAIRS, LAYOUT_NAMES,
   BG_TYPES, POSTER_SIZES,
@@ -8,20 +9,18 @@ import { fileToBase64 } from '../../utils';
 import { usePosterStore } from '../../store/usePosterStore';
 import styles from './DesignTab.module.css';
 
-
-// ── Layout thumbnail grid ─────────────────────
 function LayoutGrid({ selected, onChange }) {
   return (
     <div className={styles.layoutGrid}>
       {LAYOUT_NAMES.map((name, i) => (
         <button
           key={name}
-          className={[styles.layoutThumb, selected === i && styles.layoutSelected].filter(Boolean).join(' ')}// first assigning a standard style then assigning a style if that box is selected
+          className={[styles.layoutThumb, selected === i && styles.layoutSelected].filter(Boolean).join(' ')}
           onClick={() => onChange(i)}
           title={name}
         >
           <div className={styles.thumbBars}>
-            <div className={styles.ltBar} style={{ width: '100%', height: 7 }} /> 
+            <div className={styles.ltBar} style={{ width: '100%', height: 7 }} />
             <div className={styles.ltBar} style={{ width: '70%', height: 4 }} />
             <div className={styles.ltBar} style={{ width: '50%', height: 4 }} />
           </div>
@@ -32,7 +31,6 @@ function LayoutGrid({ selected, onChange }) {
   );
 }
 
-// ── Gradient swatch grid ──────────────────────
 function GradientGrid({ selected, onChange }) {
   return (
     <div className={styles.gradientGrid}>
@@ -49,75 +47,69 @@ function GradientGrid({ selected, onChange }) {
   );
 }
 
-// ── Accent colour row ─────────────────────────
 function AccentRow({ selected, onChange }) {
   return (
     <div className={styles.accentRow}>
-      {ACCENTS.map(c => (
+      {ACCENTS.map((color) => (
         <button
-          key={c}
-          className={[styles.accentSwatch, selected === c && styles.accentSelected].filter(Boolean).join(' ')}
-          style={{ background: c }}
-          onClick={() => onChange(c)}
-          title={c}
+          key={color}
+          className={[styles.accentSwatch, selected === color && styles.accentSelected].filter(Boolean).join(' ')}
+          style={{ background: color }}
+          onClick={() => onChange(color)}
+          title={color}
         />
       ))}
-      {/* Custom colour picker */}
       <input
         type="color"
         className={styles.colorPicker}
         value={selected}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(event) => onChange(event.target.value)}
         title="Custom colour"
       />
     </div>
   );
 }
 
-// ── Primary colour row ────────────────────────
 function PrimaryRow({ selected, onChange }) {
   return (
     <div className={styles.accentRow}>
-      {PRIMARY_COLORS.map(c => (
+      {PRIMARY_COLORS.map((color) => (
         <button
-          key={c}
-          className={[styles.accentSwatch, selected === c && styles.accentSelected].filter(Boolean).join(' ')}
-          style={{ background: c, border: '1px solid rgba(0,0,0,0.2)' }}
-          onClick={() => onChange(c)}
-          title={c}
+          key={color}
+          className={[styles.accentSwatch, selected === color && styles.accentSelected].filter(Boolean).join(' ')}
+          style={{ background: color, border: '1px solid rgba(0,0,0,0.2)' }}
+          onClick={() => onChange(color)}
+          title={color}
         />
       ))}
-      {/* Custom colour picker */}
       <input
         type="color"
         className={styles.colorPicker}
         value={selected}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(event) => onChange(event.target.value)}
         title="Custom colour"
       />
     </div>
   );
 }
 
-// ── Alignment buttons ─────────────────────────
 function AlignRow({ selected, onChange }) {
   return (
     <div className={styles.alignRow}>
-      {['left', 'center', 'right'].map(a => (
+      {['left', 'center', 'right'].map((align) => (
         <Button
-          key={a}
-          variant={selected === a ? 'primary' : 'ghost'}
-          onClick={() => onChange(a)}
+          key={align}
+          variant={selected === align ? 'primary' : 'ghost'}
+          onClick={() => onChange(align)}
           style={{ flex: 1, justifyContent: 'center' }}
         >
-          {a === 'left' ? '⬅ Left' : a === 'center' ? 'Center' : 'Right ➡'}
+          {align === 'left' ? '⬅ Left' : align === 'center' ? 'Center' : 'Right ➡'}
         </Button>
       ))}
     </div>
   );
 }
 
-// ── DesignTab ─────────────────────────────────
 export default function DesignTab() {
   const {
     layout,
@@ -131,7 +123,13 @@ export default function DesignTab() {
     align,
     size,
     textScale,
+    customTextboxes,
+    selectedCanvasElement,
     setDesignField,
+    addCustomTextbox,
+    updateCustomTextbox,
+    removeCustomTextbox,
+    selectCanvasElement,
   } = usePosterStore(
     useShallow((state) => ({
       layout: state.design.layout,
@@ -145,11 +143,24 @@ export default function DesignTab() {
       align: state.design.align,
       size: state.design.size,
       textScale: state.design.textScale,
+      customTextboxes: state.design.customTextboxes,
+      selectedCanvasElement: state.selectedCanvasElement,
       setDesignField: state.setDesignField,
+      addCustomTextbox: state.addCustomTextbox,
+      updateCustomTextbox: state.updateCustomTextbox,
+      removeCustomTextbox: state.removeCustomTextbox,
+      selectCanvasElement: state.selectCanvasElement,
     }))
   );
 
   const showGradientPanel = ['gradient', 'pattern', 'mesh'].includes(bgtype);
+  const selectedTextbox = useMemo(
+    () =>
+      selectedCanvasElement?.kind === 'textbox'
+        ? customTextboxes.find((textbox) => textbox.id === selectedCanvasElement.id) || null
+        : null,
+    [customTextboxes, selectedCanvasElement]
+  );
 
   const handleBgImage = async (file) => {
     const b64 = await fileToBase64(file);
@@ -163,6 +174,124 @@ export default function DesignTab() {
         selected={layout}
         onChange={(value) => setDesignField('layout', value)}
       />
+
+      <SectionLabel>Text Boxes</SectionLabel>
+      <Button
+        variant="primary"
+        onClick={() =>
+          addCustomTextbox({
+            x: 48,
+            y: 48,
+            fontSize: 20,
+            color: primary,
+            fontFamily: 'body',
+            width: 180,
+          })
+        }
+      >
+        Add Text Box
+      </Button>
+
+      <div className={styles.textboxList}>
+        {customTextboxes.length === 0 ? (
+          <div className={styles.textboxEmpty}>No custom text boxes yet.</div>
+        ) : (
+          customTextboxes.map((textbox, index) => (
+            <button
+              key={textbox.id}
+              className={[
+                styles.textboxItem,
+                selectedTextbox?.id === textbox.id && styles.textboxItemSelected,
+              ].filter(Boolean).join(' ')}
+              onClick={() =>
+                selectCanvasElement({
+                  kind: 'textbox',
+                  id: textbox.id,
+                })
+              }
+            >
+              <span>{textbox.text || `Textbox ${index + 1}`}</span>
+            </button>
+          ))
+        )}
+      </div>
+
+      {selectedTextbox ? (
+        <>
+          <SectionLabel>Selected Text Box</SectionLabel>
+          <FieldGroup label="Text">
+            <textarea
+              className={styles.textboxEditor}
+              value={selectedTextbox.text}
+              onChange={(event) =>
+                updateCustomTextbox(selectedTextbox.id, { text: event.target.value })
+              }
+            />
+          </FieldGroup>
+
+          <FieldGroup label="Font">
+            <Select
+              value={selectedTextbox.fontFamily}
+              onChange={(value) =>
+                updateCustomTextbox(selectedTextbox.id, { fontFamily: value })
+              }
+              options={[
+                { value: 'body', label: 'Current Body Font' },
+                { value: 'display', label: 'Current Heading Font' },
+                { value: 'Georgia,serif', label: 'Georgia' },
+                { value: 'Trebuchet MS,sans-serif', label: 'Trebuchet MS' },
+                { value: 'Verdana,sans-serif', label: 'Verdana' },
+                { value: 'Arial,sans-serif', label: 'Arial' },
+              ]}
+            />
+          </FieldGroup>
+
+          <FieldGroup label="Font Size">
+            <input
+              className={styles.textboxControl}
+              type="number"
+              min="10"
+              max="120"
+              value={selectedTextbox.fontSize}
+              onChange={(event) =>
+                updateCustomTextbox(selectedTextbox.id, {
+                  fontSize: parseInt(event.target.value, 10) || selectedTextbox.fontSize,
+                })
+              }
+            />
+          </FieldGroup>
+
+          <FieldGroup label="Box Width">
+            <input
+              className={styles.textboxControl}
+              type="number"
+              min="80"
+              max="600"
+              value={selectedTextbox.width}
+              onChange={(event) =>
+                updateCustomTextbox(selectedTextbox.id, {
+                  width: parseInt(event.target.value, 10) || selectedTextbox.width,
+                })
+              }
+            />
+          </FieldGroup>
+
+          <FieldGroup label="Colour">
+            <input
+              type="color"
+              value={selectedTextbox.color}
+              onChange={(event) =>
+                updateCustomTextbox(selectedTextbox.id, { color: event.target.value })
+              }
+              className={styles.solidColorPicker}
+            />
+          </FieldGroup>
+
+          <Button variant="ghost" onClick={() => removeCustomTextbox(selectedTextbox.id)}>
+            Delete Text Box
+          </Button>
+        </>
+      ) : null}
 
       <SectionLabel>Background</SectionLabel>
       <FieldGroup label="Style">
@@ -218,46 +347,45 @@ export default function DesignTab() {
           options={FONT_PAIRS}
         />
       </FieldGroup>
+
       <SectionLabel>Text Size</SectionLabel>
+      <FieldGroup label="Primary (Headings)">
+        <input
+          type="range"
+          min="0.7"
+          max="1.5"
+          step="0.05"
+          value={textScale?.primary || 1}
+          onChange={(e) =>
+            setDesignField('textScale', {
+              ...(textScale || {}),
+              primary: parseFloat(e.target.value)
+            })
+          }
+        />
+      </FieldGroup>
 
-<FieldGroup label="Primary (Headings)">
-  <input
-    type="range"
-    min="0.7"
-    max="1.5"
-    step="0.05"
-    value={textScale?.primary || 1}
-    onChange={(e) =>
-      setDesignField('textScale', {
-        ...(textScale || {}),
-        primary: parseFloat(e.target.value)
-      })
-    }
-  />
-</FieldGroup>
-
-<FieldGroup label="Secondary (Details)">
-  <input
-    type="range"
-    min="0.7"
-    max="1.5"
-    step="0.05"
-    value={textScale?.secondary || 1}
-    onChange={(e) =>
-      setDesignField('textScale', {
-        ...(textScale || {}),
-        secondary: parseFloat(e.target.value)
-      })
-    }
-  />
-</FieldGroup>
+      <FieldGroup label="Secondary (Details)">
+        <input
+          type="range"
+          min="0.7"
+          max="1.5"
+          step="0.05"
+          value={textScale?.secondary || 1}
+          onChange={(e) =>
+            setDesignField('textScale', {
+              ...(textScale || {}),
+              secondary: parseFloat(e.target.value)
+            })
+          }
+        />
+      </FieldGroup>
 
       <SectionLabel>Text Alignment</SectionLabel>
       <AlignRow
         selected={align}
         onChange={(value) => {
           setDesignField('align', value);
-          setDesignField('logoMode', 'auto');
         }}
       />
 

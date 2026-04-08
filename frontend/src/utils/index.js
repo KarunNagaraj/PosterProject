@@ -113,9 +113,7 @@ export async function downloadPoster(elementId, baseFilename = 'poster', format 
       filter: (node) => {
         if (node.nodeType !== 1) return true;
         const domEl = /** @type {HTMLElement} */ (node);
-        // Clean up UI handles so they don't print
-        if (domEl.title === 'Drag to resize') return false;
-        if (domEl.style?.pointerEvents === 'none' && domEl.style?.position === 'absolute' && domEl.style?.top === '-18px') return false;
+        if (domEl.dataset?.editorChrome === 'true') return false;
         return true;
       },
       style: {
