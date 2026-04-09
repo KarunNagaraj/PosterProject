@@ -17,12 +17,14 @@ export function SpeakerCard({
     <div
       style={{
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         gap: 10,
         width: 220,
       }}
     >
       {img ? (
+        <DraggableItem>
         <img
           src={img}
           alt={name}
@@ -35,7 +37,9 @@ export function SpeakerCard({
             flexShrink: 0,
           }}
         />
+        </DraggableItem>
       ) : (
+        <DraggableItem>
         <div
           style={{
             width: size,
@@ -52,8 +56,9 @@ export function SpeakerCard({
         >
           👤
         </div>
+        </DraggableItem>
       )}
-
+      <DraggableItem>
       <div style={{ flex: 1 }}>
         {name ? (
           <div
@@ -95,7 +100,9 @@ export function SpeakerCard({
             {alumni}
           </div>
         ) : null}
+        
       </div>
+      </DraggableItem>
     </div>
   );
 }
@@ -184,28 +191,16 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
   return (
     <div
       style={{
-        background: 'rgba(0,0,0,0.38)',
+        
         padding: '16px 24px',
-        borderTop: `2px solid ${accent}`,
+        
       }}
     >
-      <div
-        style={{
-          fontFamily: bf,
-          fontSize: 9,
-          color: accent,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          textAlign: centered ? 'center' : 'left',
-          marginBottom: 12,
-        }}
-      >
-        Resource Person{speaker2.name ? 's' : ''}
-      </div>
+
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           gap: 14,
           alignItems: centered ? 'center' : 'flex-start',
         }}
@@ -219,7 +214,7 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
           df={df}
           bf={bf}
         />
-        {speaker2.name && (
+        
           <SpeakerCard
             img={speaker2.img}
             name={speaker2.name}
@@ -229,7 +224,7 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
             df={df}
             bf={bf}
           />
-        )}
+        
       </div>
     </div>
   );
