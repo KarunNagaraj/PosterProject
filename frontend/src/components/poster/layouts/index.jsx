@@ -21,13 +21,6 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
   return { acc, pri, al, df, bf, bg, g, dateTimeStr, showQR, textScale, speakers };
 }
 
-function CanvasMove({
-  children,
-  wrapperStyle,
-}) {
-  return wrapperStyle ? <div style={wrapperStyle}>{children}</div> : children;
-}
-
 // ─────────────────────────────────────────────
 // L0 — Classic
 // ─────────────────────────────────────────────
@@ -41,7 +34,7 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
       {/* Header */}
       <div style={{ position: 'relative',background: 'rgba(0,0,0,0.38)', padding: '22px 24px', ...alignStyle, borderBottom: `3px solid ${acc}` }}>
               {poster.logoImg && (
-              <CanvasMove layoutId={layoutId} elementId="logo-classic">
+              
                 <div style={{ height: 64, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: al === 'left' ? 'flex-start' : al === 'right' ? 'flex-end' : 'center' }}>
                   <img
                     src={poster.logoImg}
@@ -56,64 +49,64 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
                     }}
                   />
                 </div>
-              </CanvasMove>
+              
             )}
-        <CanvasMove layoutId={layoutId} elementId="institution-classic">
+        
           <div>
             {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(17, textScale.primary), fontWeight: 700, color: pri, letterSpacing: '0.04em' }}>{poster.university}</div>}
             {poster.dept       && <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, marginTop: 2, fontWeight: 600, letterSpacing: '0.05em' }}>{poster.dept}</div>}
             {poster.campus     && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}99`, marginTop: 2 }}>{poster.campus}</div>}
           </div>
-        </CanvasMove>
+        
       </div>
 
       {/* Category band */}
       <div style={{ padding: '5px 24px', background: acc, textAlign: 'center' }}>
-        <CanvasMove layoutId={layoutId} elementId="category-classic">
+        
           <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: '#000', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'inline-block' }}>{poster.category}</span>
-        </CanvasMove>
+        
       </div>
 
       {/* Body */}
       <div style={{ flex: 1, padding: '26px 24px', ...alignStyle, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <CanvasMove layoutId={layoutId} elementId="title-classic">
+        
           {poster.title
             ? <div style={{ fontFamily: df, fontSize: scaleFont(26, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 10, textShadow: '0 2px 14px rgba(0,0,0,0.4)' }}>{poster.title}</div>
             : <div style={{ fontFamily: 'Georgia', fontSize: scaleFont(20, textScale.primary), color: `${pri}33`, fontStyle: 'italic' }}>Event Title</div>
           }
-        </CanvasMove>
+        
         {poster.subtitle && (
-          <CanvasMove layoutId={layoutId} elementId="subtitle-classic">
+          
             <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, marginBottom: 18, fontStyle: 'italic' }}>{poster.subtitle}</div>
-          </CanvasMove>
+          
         )}
-        <CanvasMove layoutId={layoutId} elementId="details-classic">
+        
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
             <InfoRow icon="📅" text={[formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ')} accent={acc} primary={pri} bf={bf} align={al} />
             <InfoRow icon="📍" text={poster.venue}    accent={acc} primary={pri} bf={bf} align={al} />
             <InfoRow icon="👥" text={poster.audience} accent={acc} primary={pri} bf={bf} align={al} />
           </div>
-        </CanvasMove>
-        <CanvasMove layoutId={layoutId} elementId="qr-classic">
+        
+        
           <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
-        </CanvasMove>
+        
       </div>
 
       <div style={{ position: 'relative' }}>
-        <CanvasMove layoutId={layoutId} elementId="speakers-classic">
+        
           <SpeakerFooter poster={poster} layoutId={layoutId} accent={acc} primary={pri} bf={bf} df={df} />
-        </CanvasMove>
+        
         {speakers.length > 0 && (
-          <CanvasMove layoutId={layoutId} elementId="sdgs-classic" wrapperStyle={{ position: 'absolute', right: 24, top: '50%' }}>
+          <div style={{ position: 'absolute', right: 24, top: '50%' }}>
             <div style={{ transform: 'translateY(-50%)' }}>
               <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
-          </CanvasMove>
+          </div>
         )}
       </div>
-      <CanvasMove layoutId={layoutId} elementId="tagline-classic">
+      
         <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} bf={bf} primary={pri} />
-      </CanvasMove>
+      
     </div>
   );
 }
@@ -144,25 +137,25 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
         {/* Institution row */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}>
           {poster.logoImg && (
-            <CanvasMove layoutId={layoutId} elementId="logo-editorial">
+            
               <img
                 src={poster.logoImg}
                 alt="logo"
                  style={{ height: 60, width: 60, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6, marginBottom: 10, position: 'relative' }}
               />
-            </CanvasMove>
+            
           )}
-          <CanvasMove layoutId={layoutId} elementId="institution-editorial">
+          
             <div>
               {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(14, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div>}
               {poster.dept && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc, marginTop: 2 }}>{poster.dept}</div>}
               {poster.campus && <div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: `${pri}80`, marginTop: 1 }}>{poster.campus}</div>}
             </div>
-          </CanvasMove>
+          
         </div>
 
         {/* Category */}
-        <CanvasMove layoutId={layoutId} elementId="category-editorial">
+        
           <div style={{
             display: 'inline-block',
             background: acc,
@@ -182,10 +175,10 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
               {poster.category}
             </span>
           </div>
-        </CanvasMove>
+        
 
         {/* Title */}
-        <CanvasMove layoutId={layoutId} elementId="title-editorial">
+        
           {poster.title
           ? <div style={{
               fontFamily: df,
@@ -207,10 +200,10 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
               Event title appears here
             </div>
         }
-        </CanvasMove>
+        
 
         {poster.subtitle && (
-          <CanvasMove layoutId={layoutId} elementId="subtitle-editorial">
+          
             <div style={{
             fontFamily: bf,
             fontSize: scaleFont(13, textScale.secondary),
@@ -220,13 +213,13 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
           }}>
             {poster.subtitle}
           </div>
-          </CanvasMove>
+          
         )}
 
         <div style={{ width: 48, height: 2, background: acc, margin: '14px 0' }} />
 
         {/* Info */}
-        <CanvasMove layoutId={layoutId} elementId="details-editorial">
+        
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
           {(poster.date || poster.time) && (
             <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>
@@ -244,11 +237,11 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
             </div>
           )}
         </div>
-        </CanvasMove>
+        
 
-        <CanvasMove layoutId={layoutId} elementId="qr-editorial">
+        
           <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
-        </CanvasMove>
+        
 
         <div style={{ flex: 1 }} />
       </div>
@@ -280,12 +273,12 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
           }}>
 
             {/* LEFT: Speakers */}
-            <CanvasMove layoutId={layoutId} elementId="speakers-editorial">
+            
               <SpeakerGallery poster={poster} layoutId={layoutId} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
-            </CanvasMove>
+            
 
             {/* RIGHT: SDGs */}
-         <CanvasMove layoutId={layoutId} elementId="sdgs-editorial"><SDGBlock sdgs={poster.sdgs} size={30} /></CanvasMove>
+         <SDGBlock sdgs={poster.sdgs} size={30} />
 
           </div>
         </div>
@@ -299,7 +292,7 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
           textAlign: 'right',
           background: 'rgba(0,0,0,0.2)'
         }}>
-          <CanvasMove layoutId={layoutId} elementId="tagline-editorial">
+          
             <span style={{
             fontFamily: bf,
             fontSize: scaleFont(10, textScale.secondary),
@@ -308,7 +301,7 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
           }}>
             {poster.tagline || poster.reglink}
           </span>
-          </CanvasMove>
+          
         </div>
       )}
 
@@ -328,65 +321,65 @@ export function L2_Split({ poster, design, qrDataUrl }) {
       {/* Top half */}
       <div style={{ flex: '0 0 40%', background: `linear-gradient(160deg,${g[0]},${g[1]})`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 70% 30%,${acc}20,transparent 60%)` }} />
-        {poster.logoImg && <CanvasMove layoutId={layoutId} elementId="logo-split"><img src={poster.logoImg} alt="logo" style={{ height: 60, width: 60, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6, marginBottom: 10, position: 'relative' }} /></CanvasMove>}
-        <CanvasMove layoutId={layoutId} elementId="institution-split">
+        {poster.logoImg && <img src={poster.logoImg} alt="logo" style={{ height: 60, width: 60, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6, marginBottom: 10, position: 'relative' }} />}
+        
           <div style={{ position: 'relative', textAlign: 'center' }}>
           {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(15, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div>}
           {poster.dept       && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc, marginTop: 3 }}>{poster.dept}</div>}
           {poster.campus     && <div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: `${pri}80`, marginTop: 2 }}>{poster.campus}</div>}
         </div>
-        </CanvasMove>
-        <CanvasMove layoutId={layoutId} elementId="category-split">
+        
+        
           <div style={{ marginTop: 16, background: acc, padding: '5px 18px', borderRadius: 20 }}>
           <span style={{ fontFamily: bf, fontSize: 10, fontWeight: 700, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{poster.category}</span>
         </div>
-        </CanvasMove>
+        
       </div>
 
       {/* Bottom half */}
       <div style={{ flex: 1, background: `linear-gradient(160deg,${g[1]},${g[2]})`, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
-          <CanvasMove layoutId={layoutId} elementId="title-split">
+          
           {poster.title
             ? <div style={{ fontFamily: df, fontSize: scaleFont(22, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 8 }}>{poster.title}</div>
             : <div style={{ fontSize: scaleFont(18, textScale.primary), color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Your event title</div>
           }
-          </CanvasMove>
-          {poster.subtitle && <CanvasMove layoutId={layoutId} elementId="subtitle-split"><div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div></CanvasMove>}
-          <CanvasMove layoutId={layoutId} elementId="details-split">
+          
+          {poster.subtitle && <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>}
+          
             <div style={{ background: 'rgba(0,0,0,0.22)', borderRadius: 8, padding: 12, marginTop: 10, display: 'flex', flexDirection: 'column', gap: 7, borderLeft: `3px solid ${acc}` }}>
             {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
             {poster.venue    && <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>📍 {poster.venue}</div>}
             {poster.audience && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}A5` }}>👥 {poster.audience}</div>}
           </div>
-          </CanvasMove>
+          
         </div>
         <div>
           {speakers.length > 0 && (
             <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
               <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-                <CanvasMove layoutId={layoutId} elementId="speakers-split">
+                
                   <SpeakerGallery poster={poster} layoutId={layoutId} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
-                </CanvasMove>
-                <CanvasMove layoutId={layoutId} elementId="sdgs-split"><SDGBlock sdgs={poster.sdgs} size={30} /></CanvasMove>
+                
+                <SDGBlock sdgs={poster.sdgs} size={30} />
               </div>
             </div>
           )}
-          <CanvasMove layoutId={layoutId} elementId="qr-split">
+          
             <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
-          </CanvasMove>
+          
         </div>
       </div>
-      <CanvasMove layoutId={layoutId} elementId="tagline-split">
+      
         <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} bf={bf} primary={pri} />
-      </CanvasMove>
+      
     </div>
   );
 }
 
 // ─────────────────────────────────────────────
-// L3 — Band (Now completely Draggable!)
+// L3 — Band
 // ─────────────────────────────────────────────
 export function L3_Band({ poster, design, qrDataUrl }) {
   const { acc, pri, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
@@ -399,73 +392,73 @@ export function L3_Band({ poster, design, qrDataUrl }) {
       {/* Header Info */}
       <div style={{ padding: '22px 28px 14px', display: 'flex', alignItems: 'center', gap: 14, marginTop: 7 }}>
         {poster.logoImg && (
-          <CanvasMove layoutId={layoutId} elementId="logo-band">
+          
             <img src={poster.logoImg} alt="logo" style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 4 }} />
-          </CanvasMove>
+          
         )}
-        <CanvasMove layoutId={layoutId} elementId="institution-band">
+        
           <div>
             {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(15, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div>}
             {poster.dept       && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc }}>{poster.dept}</div>}
             {poster.campus     && <div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: `${pri}80` }}>{poster.campus}</div>}
           </div>
-        </CanvasMove>
+        
       </div>
 
       {/* Category Pill */}
-      <CanvasMove layoutId={layoutId} elementId="category-band">
+      
         <div style={{ margin: '0 28px', padding: '12px 20px', background: acc, borderRadius: 8, textAlign: 'center' }}>
           <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{poster.category}</span>
         </div>
-      </CanvasMove>
+      
 
       {/* Main Body */}
       <div style={{ padding: '22px 28px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
         
-        <CanvasMove layoutId={layoutId} elementId="title-band">
+        
           {poster.title
             ? <div style={{ fontFamily: df, fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>{poster.title}</div>
             : <div style={{ fontSize: 20, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'Georgia' }}>Event Title</div>
           }
-        </CanvasMove>
+        
 
         {poster.subtitle && (
-          <CanvasMove layoutId={layoutId} elementId="subtitle-band">
+          
             <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div>
-          </CanvasMove>
+          
         )}
 
-        <CanvasMove layoutId={layoutId} elementId="divider-band">
+        
           <div style={{ width: 60, height: 2, background: acc, margin: '12px auto' }} />
-        </CanvasMove>
+        
 
-        <CanvasMove layoutId={layoutId} elementId="details-band">
+        
           <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 8, alignItems: 'center', margin: '0 auto' }}>
             {(poster.date || poster.time) && <div style={{ fontFamily: bf, fontSize: 13, color: '#fff', background: 'rgba(0,0,0,0.22)', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div>}
             {poster.venue    && <div style={{ fontFamily: bf, fontSize: 12, color: '#fff', background: 'rgba(0,0,0,0.22)', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.1)' }}>📍 {poster.venue}</div>}
             {poster.audience && <div style={{ fontFamily: bf, fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>For: {poster.audience}</div>}
           </div>
-        </CanvasMove>
+        
 
-        <CanvasMove layoutId={layoutId} elementId="qr-band">
+        
           <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
-        </CanvasMove>
+        
       </div>
 
       {/* Footer */}
       <div style={{ position: 'relative' }}>
-        <CanvasMove layoutId={layoutId} elementId="speakers-band">
+        
           <SpeakerFooter poster={poster} layoutId={layoutId} accent={acc} primary={pri} bf={bf} df={df} />
-        </CanvasMove>
+        
         
         {speakers.length > 0 && (
           
             <div style={{ position: 'absolute', right: 28, top: '50%', transform: 'translateY(-50%)',zIndex: 10 }}>
-              <CanvasMove layoutId={layoutId} elementId="sdgs-band">
+              
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
               <SDGBlock sdgs={poster.sdgs} size={30} />
               </div>
-              </CanvasMove>
+              
             </div>
           
         )}
@@ -493,13 +486,13 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
         
         {/* Top Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 22 }}>
-          <CanvasMove layoutId={design.layout} elementId="sdgs-minimal">
+          
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
               <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
-          </CanvasMove>
+          
           {poster.logoImg && (
-            <CanvasMove layoutId={design.layout} elementId="logo-minimal">
+            
               <div style={{ height: 64, position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <img
                   src={poster.logoImg}
@@ -515,56 +508,56 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
                   }}
                 />
               </div>
-            </CanvasMove>
+            
             )}
         </div>
 
         {/* University Section */}
-        <CanvasMove layoutId={design.layout} elementId="institution-minimal">
+        
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 4, marginBottom: 24, padding: '0 24px' }}>
             {poster.university && <div style={{ fontFamily: df, fontSize: scaleFont(24, textScale.primary), fontWeight: 800, color: pri }}>{poster.university}</div>}
             {poster.dept && <div style={{ fontFamily: bf, fontSize: scaleFont(15, textScale.secondary), fontWeight: 700, color: acc }}>{poster.dept}</div>}
             {poster.campus && <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.primary), color: `${pri}cc` }}>{poster.campus}</div>}
           </div>
-        </CanvasMove>
+        
 
         {/* Main Content */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', justifyContent: 'center', gap: 10, padding: '0 24px' }}>
           
-          <CanvasMove layoutId={design.layout} elementId="category-minimal">
+          
             <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${acc}`, padding: '5px 18px', borderRadius: 4, marginBottom: 12 }}>
             <span style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.secondary), fontWeight: 700, color: acc, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
               {poster.category}
             </span>
           </div>
-          </CanvasMove>
+          
 
-          <CanvasMove layoutId={design.layout} elementId="title-minimal">
+          
             {poster.title
             ? <div style={{ fontFamily: df, fontSize: scaleFont(24, textScale.primary), fontWeight: 800, color: pri }}>{poster.title}</div>
             : <div style={{ fontFamily: 'Georgia', fontSize: scaleFont(24, textScale.primary), color: `${pri}33`, fontStyle: 'italic' }}>Event Title</div>
           }
-          </CanvasMove>
+          
 
           {poster.subtitle && (
-            <CanvasMove layoutId={design.layout} elementId="subtitle-minimal">
+            
               <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, fontStyle: 'italic', marginTop: 8 }}>
               {poster.subtitle}
             </div>
-            </CanvasMove>
+            
           )}
 
-          <CanvasMove layoutId={design.layout} elementId="divider-minimal">
+          
             <div style={{ width: 60, height: 2, background: acc, margin: '16px auto' }} />
-          </CanvasMove>
+          
         </div>
 
         {/* Speakers */}
         {speakers.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, marginTop: 24 }}>
-            <CanvasMove layoutId={design.layout} elementId="speakers-minimal">
+            
               <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} imageSize={180} />
-            </CanvasMove>
+            
           </div>
         )}
 
@@ -633,10 +626,10 @@ export function L5_Minimal({ poster, design, qrDataUrl }) {
         {speakers.length > 0 && (
           <div style={{ paddingTop: 14, borderTop: '0.5px solid rgba(255,255,255,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-              <CanvasMove layoutId={design.layout} elementId="speakers-overlay">
+              
                 <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
-              </CanvasMove>
-              <CanvasMove layoutId={design.layout} elementId="sdgs-overlay"><SDGBlock sdgs={poster.sdgs} size={30} /></CanvasMove>
+              
+              <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
           </div>
         )}
@@ -699,10 +692,10 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
         </div>
         {speakers.length > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
-            <CanvasMove layoutId={design.layout} elementId="speakers-diagonal">
+            
               <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
-            </CanvasMove>
-            <CanvasMove layoutId={design.layout} elementId="sdgs-diagonal"><SDGBlock sdgs={poster.sdgs} size={30} /></CanvasMove>
+            
+            <SDGBlock sdgs={poster.sdgs} size={30} />
           </div>
         )}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 12 }}>
@@ -762,11 +755,11 @@ export function L7_Frame({ poster, design, qrDataUrl }) {
             <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 10 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
               <div style={{ flex: 1 }} />
-              <CanvasMove layoutId={design.layout} elementId="speakers-frame">
+              
                 <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} />
-              </CanvasMove>
+              
               <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                <CanvasMove layoutId={design.layout} elementId="sdgs-frame"><SDGBlock sdgs={poster.sdgs} size={30} /></CanvasMove>
+                <SDGBlock sdgs={poster.sdgs} size={30} />
               </div>
             </div>
           </div>
@@ -819,10 +812,10 @@ export function L8_Timeline({ poster, design, qrDataUrl }) {
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
             <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-              <CanvasMove layoutId={design.layout} elementId="speakers-timeline">
+              
                 <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} imageSize={44} />
-              </CanvasMove>
-              <CanvasMove layoutId={design.layout} elementId="sdgs-timeline"><SDGBlock sdgs={poster.sdgs} size={30} /></CanvasMove>
+              
+              <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
           </div>
         )}
@@ -888,10 +881,10 @@ export function L9_Typographic({ poster, design, qrDataUrl }) {
               <div style={{ marginTop: 16 }}>
                 <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-                  <CanvasMove layoutId={design.layout} elementId="speakers-typographic">
+                  
                     <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} imageSize={44} />
-                  </CanvasMove>
-                  <CanvasMove layoutId={design.layout} elementId="sdgs-typographic"><SDGBlock sdgs={poster.sdgs} size={30} /></CanvasMove>
+                  
+                  <SDGBlock sdgs={poster.sdgs} size={30} />
                 </div>
               </div>
             )}
@@ -926,3 +919,5 @@ function parse(cssStr) {
   });
   return style;
 }
+
+
