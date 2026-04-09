@@ -1,6 +1,6 @@
 import { GRADIENTS } from '../../../constants';
 import { buildBackground, formatDate, formatTime, getDisplayFont, getBodyFont, scaleFont } from '../../../utils';
-import { SpeakerGallery, SpeakerFooter, InfoRow, QRBlock, TaglineBar, SDGBlock, getSpeakers } from '../PosterParts';
+import { SpeakerCard, SpeakerFooter, InfoRow, QRBlock, TaglineBar, SDGBlock } from '../PosterParts';
 
 // ── Shared props shape ────────────────────────
 // Each layout receives: { poster, design, qrDataUrl }
@@ -16,18 +16,32 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
   const dateTimeStr = [formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ');
   const showQR = poster.showQR && !!qrDataUrl;
   const textScale = design.textScale || { primary: 1, secondary: 1 };
-  const speakers = getSpeakers(poster);
+  const normalizedSpeakers = Array.isArray(poster.speakers)
+    ? poster.speakers.filter((speaker) => speaker.name || speaker.img)
+    : [];
+  const speaker1 = normalizedSpeakers[0] || {
+    img: poster.sp1img,
+    name: poster.sp1name,
+    title: poster.sp1title,
+    alumni: poster.sp1details ?? poster.sp1alumni,
+  };
+  const speaker2 = normalizedSpeakers[1] || {
+    img: poster.sp2img,
+    name: poster.sp2name,
+    title: poster.sp2title,
+    alumni: poster.sp2details ?? poster.sp2alumni,
+  };
+  const hasSpeaker = speaker1.name || speaker1.img || speaker2.name || speaker2.img;
 
-  return { acc, pri, al, df, bf, bg, g, dateTimeStr, showQR, textScale, speakers };
+  return { acc, pri, al, df, bf, bg, g, dateTimeStr, showQR, textScale, speaker1, speaker2, hasSpeaker };
 }
 
 // ─────────────────────────────────────────────
 // L0 — Classic
 // ─────────────────────────────────────────────
 export function L0_Classic({ poster, design, qrDataUrl }) {
-  const { acc, pri, al, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, al, df, bf, bg, textScale, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
   const alignStyle = { textAlign: al };
-  const layoutId = design.layout;
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
@@ -94,9 +108,9 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
 
       <div style={{ position: 'relative' }}>
         
-          <SpeakerFooter poster={poster} layoutId={layoutId} accent={acc} primary={pri} bf={bf} df={df} />
+          <SpeakerFooter poster={poster} accent={acc} bf={bf} df={df} />
         
-        {speakers.length > 0 && (
+        {hasSpeaker && (
           <div style={{ position: 'absolute', right: 24, top: '50%' }}>
             <div style={{ transform: 'translateY(-50%)' }}>
               <SDGBlock sdgs={poster.sdgs} size={30} />
@@ -115,8 +129,7 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
 // L1 — Editorial
 // ─────────────────────────────────────────────
 export function L1_Editorial({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
-  const layoutId = design.layout;
+  const { acc, pri, df, bf, bg, textScale, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{
@@ -247,7 +260,7 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
       </div>
 
       {/* Speaker + SDG section */}
-      {speakers.length > 0 && (
+      {hasSpeaker && (
         <div style={{
           padding: '18px 28px',
           background: 'rgba(0,0,0,0.3)',
@@ -262,7 +275,7 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
             textTransform: 'uppercase',
             marginBottom: 10
           }}>
-            Speaker{speakers.length > 1 ? 's' : ''}
+            Speaker{speaker2.name ? 's' : ''}
           </div>
 
           <div style={{
@@ -274,7 +287,10 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
 
             {/* LEFT: Speakers */}
             
-              <SpeakerGallery poster={poster} layoutId={layoutId} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} />
+                {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} />}
+              </div>
             
 
             {/* RIGHT: SDGs */}
@@ -313,8 +329,7 @@ export function L1_Editorial({ poster, design, qrDataUrl }) {
 // L2 — Split
 // ─────────────────────────────────────────────
 export function L2_Split({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, g, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
-  const layoutId = design.layout;
+  const { acc, pri, df, bf, g, textScale, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
@@ -355,13 +370,14 @@ export function L2_Split({ poster, design, qrDataUrl }) {
           
         </div>
         <div>
-          {speakers.length > 0 && (
+          {hasSpeaker && (
             <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
-              <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
+              <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{speaker2.name ? 's' : ''}</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-                
-                  <SpeakerGallery poster={poster} layoutId={layoutId} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
-                
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} />
+                  {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} />}
+                </div>
                 <SDGBlock sdgs={poster.sdgs} size={30} />
               </div>
             </div>
@@ -382,8 +398,7 @@ export function L2_Split({ poster, design, qrDataUrl }) {
 // L3 — Band
 // ─────────────────────────────────────────────
 export function L3_Band({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
-  const layoutId = design.layout;
+  const { acc, pri, df, bf, bg, textScale, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative', overflow: 'hidden' }}>
@@ -448,10 +463,10 @@ export function L3_Band({ poster, design, qrDataUrl }) {
       {/* Footer */}
       <div style={{ position: 'relative' }}>
         
-          <SpeakerFooter poster={poster} layoutId={layoutId} accent={acc} primary={pri} bf={bf} df={df} />
+          <SpeakerFooter poster={poster} accent={acc} bf={bf} df={df} />
         
         
-        {speakers.length > 0 && (
+        {hasSpeaker && (
           
             <div style={{ position: 'absolute', right: 28, top: '50%', transform: 'translateY(-50%)',zIndex: 10 }}>
               
@@ -469,9 +484,7 @@ export function L3_Band({ poster, design, qrDataUrl }) {
 }
 
 export function L4_Overlay({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
-  
-  const dateTimeStr = [formatDate(poster.date), formatTime(poster.time)].filter(Boolean).join(' · ');
+  const { acc, pri, df, bf, bg, textScale, dateTimeStr, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative', overflow: 'hidden' }}>
@@ -553,11 +566,14 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
         </div>
 
         {/* Speakers */}
-        {speakers.length > 0 && (
+        {hasSpeaker && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, marginTop: 24 }}>
-            
-              <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} imageSize={180} />
-            
+            <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <DraggableItem>
+              <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} size={90} />
+              </DraggableItem>
+              {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} size={90} />}
+            </div>
           </div>
         )}
 
@@ -591,7 +607,7 @@ export function L4_Overlay({ poster, design, qrDataUrl }) {
 const CATEGORY_ICONS = { Workshop: '🛠', Seminar: '🎓', Hackathon: '💻', 'Competitive Exam': '🏆', Conference: '🌐', Webinar: '🖥', FDP: '📋', Symposium: '🎤', 'Skill Enhancement': '💡', 'Guest Lecture': '🎙' };
 
 export function L5_Minimal({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg, textScale, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
@@ -623,12 +639,13 @@ export function L5_Minimal({ poster, design, qrDataUrl }) {
           {poster.venue    && <InfoCard label="Venue"  value={poster.venue}   acc={acc} bf={bf} span={2} textScale={textScale} />}
           {poster.audience && <InfoCard label="For"    value={poster.audience} acc={acc} bf={bf} span={2} textScale={textScale} />}
         </div>
-        {speakers.length > 0 && (
+        {hasSpeaker && (
           <div style={{ paddingTop: 14, borderTop: '0.5px solid rgba(255,255,255,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-              
-                <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
-              
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} />
+                {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} />}
+              </div>
               <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
           </div>
@@ -655,7 +672,7 @@ function InfoCard({ label, value, acc, bf, span, textScale }) {
 // L6 — Diagonal
 // ─────────────────────────────────────────────
 export function L6_Diagonal({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, g, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, g, textScale, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative', overflow: 'hidden', background: g[0] }}>
@@ -690,11 +707,12 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
             {poster.audience && <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}A5` }}>👥 {poster.audience}</div>}
           </div>
         </div>
-        {speakers.length > 0 && (
+        {hasSpeaker && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
-            
-              <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} />
-            
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} />
+              {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} />}
+            </div>
             <SDGBlock sdgs={poster.sdgs} size={30} />
           </div>
         )}
@@ -711,7 +729,7 @@ export function L6_Diagonal({ poster, design, qrDataUrl }) {
 // L7 — Frame
 // ─────────────────────────────────────────────
 export function L7_Frame({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg, textScale, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
   const corner = { position: 'absolute', width: 20, height: 20 };
 
   return (
@@ -750,14 +768,15 @@ export function L7_Frame({ poster, design, qrDataUrl }) {
           </div>
           <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
         </div>
-        {speakers.length > 0 && (
+        {hasSpeaker && (
           <div style={{ paddingTop: 14, borderTop: `1px solid ${acc}30` }}>
-            <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 10 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
+            <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 10 }}>Speaker{speaker2.name ? 's' : ''}</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
               <div style={{ flex: 1 }} />
-              
-                <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} />
-              
+              <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} />
+                {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} />}
+              </div>
               <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
                 <SDGBlock sdgs={poster.sdgs} size={30} />
               </div>
@@ -773,7 +792,7 @@ export function L7_Frame({ poster, design, qrDataUrl }) {
 // L8 — Timeline
 // ─────────────────────────────────────────────
 export function L8_Timeline({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, bg, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, bg, textScale, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
 
   return (
     <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', minHeight: 'inherit' }}>
@@ -808,13 +827,14 @@ export function L8_Timeline({ poster, design, qrDataUrl }) {
           {poster.audience && <TimelineCard icon="👥" label="Audience" value={poster.audience} acc={acc} pri={pri} bf={bf} textScale={textScale} />}
         </div>
 
-        {speakers.length > 0 && (
+        {hasSpeaker && (
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
+            <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speaker{speaker2.name ? 's' : ''}</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-              
-                <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} imageSize={44} />
-              
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} size={44} />
+                {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} size={44} />}
+              </div>
               <SDGBlock sdgs={poster.sdgs} size={30} />
             </div>
           </div>
@@ -841,7 +861,7 @@ function TimelineCard({ icon, label, value, acc, pri, bf, textScale }) {
 // L9 — Typographic
 // ─────────────────────────────────────────────
 export function L9_Typographic({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, g, textScale, speakers } = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, df, bf, g, textScale, speaker1, speaker2, hasSpeaker } = useLayoutProps({ poster, design, qrDataUrl });
   const ghostLetter = poster.category?.[0] || 'E';
 
   return (
@@ -877,13 +897,14 @@ export function L9_Typographic({ poster, design, qrDataUrl }) {
 
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            {speakers.length > 0 && (
+            {hasSpeaker && (
               <div style={{ marginTop: 16 }}>
-                <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Speaker{speakers.length > 1 ? 's' : ''}</div>
+                <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Speaker{speaker2.name ? 's' : ''}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-                  
-                    <SpeakerGallery poster={poster} layoutId={design.layout} accent={acc} primary={pri} df={df} bf={bf} centered={false} imageSize={44} />
-                  
+                  <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                    <SpeakerCard img={speaker1.img} name={speaker1.name} title={speaker1.title} alumni={speaker1.alumni} accent={acc} df={df} bf={bf} size={44} />
+                    {speaker2.name && <SpeakerCard img={speaker2.img} name={speaker2.name} title={speaker2.title} alumni={speaker2.alumni} accent={acc} df={df} bf={bf} size={44} />}
+                  </div>
                   <SDGBlock sdgs={poster.sdgs} size={30} />
                 </div>
               </div>
@@ -919,5 +940,50 @@ function parse(cssStr) {
   });
   return style;
 }
+import { useState, useRef } from 'react';
 
+// ── Drag & Drop Wrapper ─────────────────────────────────────
+function DraggableItem({ children }) {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const startPos = useRef({ x: 0, y: 0 });
+
+  const onPointerDown = (e) => {
+    setIsDragging(true);
+    // Calculate where inside the element the user clicked
+    startPos.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+    e.target.setPointerCapture(e.pointerId);
+    e.stopPropagation(); // Prevents parent drags if nested
+  };
+
+  const onPointerMove = (e) => {
+    if (!isDragging) return;
+    setPos({
+      x: e.clientX - startPos.current.x,
+      y: e.clientY - startPos.current.y,
+    });
+  };
+
+  const onPointerUp = (e) => {
+    setIsDragging(false);
+    e.target.releasePointerCapture(e.pointerId);
+  };
+
+  return (
+    <div
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      style={{
+        transform: `translate(${pos.x}px, ${pos.y}px)`,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        display: 'inline-block',
+        touchAction: 'none', // Prevents screen scrolling on mobile while dragging
+        zIndex: isDragging ? 50 : 1, // Brings the dragged item to the front
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 

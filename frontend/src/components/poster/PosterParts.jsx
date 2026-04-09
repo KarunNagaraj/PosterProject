@@ -1,50 +1,30 @@
 import { SDG_OPTIONS } from '../../constants';
 
-export function getSpeakers(poster) {
-  if (Array.isArray(poster.speakers)) {
-    return poster.speakers.filter(
-      (speaker) => speaker.name || speaker.title || speaker.details || speaker.img || speaker.role
-    );
-  }
-
-  return [1, 2]
-    .map((index) => ({
-      id: `speaker-${index}`,
-      role: '',
-      name: poster[`sp${index}name`] || '',
-      title: poster[`sp${index}title`] || '',
-      details: poster[`sp${index}details`] ?? poster[`sp${index}alumni`] ?? '',
-      img: poster[`sp${index}img`] || null,
-    }))
-    .filter((speaker) => speaker.name || speaker.title || speaker.details || speaker.img);
-}
-
 export function SpeakerCard({
-  speaker,
+  img,
+  name,
+  title,
+  alumni,
   accent,
   df,
   bf,
   size = 52,
-  primary = '#fff',
-  centered = true,
 }) {
-  if (!speaker) return null;
+  if (!name && !img) return null;
 
   return (
     <div
       style={{
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: centered ? 'center' : 'flex-start',
-        textAlign: centered ? 'center' : 'left',
-        gap: 8,
+        alignItems: 'center',
+        gap: 10,
         width: 220,
       }}
     >
-      {speaker.img ? (
+      {img ? (
         <img
-          src={speaker.img}
-          alt={speaker.name}
+          src={img}
+          alt={name}
           style={{
             width: size,
             height: size,
@@ -52,7 +32,6 @@ export function SpeakerCard({
             objectFit: 'cover',
             border: `2px solid ${accent}`,
             flexShrink: 0,
-            background: '#fff',
           }}
         />
       ) : (
@@ -74,104 +53,48 @@ export function SpeakerCard({
         </div>
       )}
 
-      <div style={{ width: '100%' }}>
-        {speaker.role ? (
-          <div
-            style={{
-              fontFamily: bf,
-              fontSize: 9,
-              color: accent,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginBottom: 4,
-            }}
-          >
-            {speaker.role}
-          </div>
-        ) : null}
-
-        {speaker.name ? (
+      <div style={{ flex: 1 }}>
+        {name ? (
           <div
             style={{
               fontFamily: df,
               fontSize: 13,
               fontWeight: 700,
-              color: primary,
+              color: '#fff',
               lineHeight: 1.2,
             }}
           >
-            {speaker.name}
+            {name}
           </div>
         ) : null}
 
-        {speaker.title ? (
+        {title ? (
           <div
             style={{
               fontFamily: bf,
               fontSize: 10,
               color: accent,
-              marginTop: 2,
-              lineHeight: 1.25,
+              marginTop: 1,
             }}
           >
-            {speaker.title}
+            {title}
           </div>
         ) : null}
 
-        {speaker.details ? (
+        {alumni ? (
           <div
             style={{
               fontFamily: bf,
               fontSize: 9,
-              color: 'rgba(255,255,255,0.65)',
-              marginTop: 2,
+              color: 'rgba(255,255,255,0.5)',
+              marginTop: 1,
               fontStyle: 'italic',
-              lineHeight: 1.25,
             }}
           >
-            {speaker.details}
+            {alumni}
           </div>
         ) : null}
       </div>
-    </div>
-  );
-}
-
-export function SpeakerGallery({
-  poster,
-  accent,
-  primary = '#fff',
-  bf,
-  df,
-  centered = true,
-  imageSize = 64,
-  gap = 16,
-}) {
-  const speakers = getSpeakers(poster);
-  if (!speakers.length) return null;
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        gap,
-        flexWrap: 'wrap',
-        justifyContent: centered ? 'center' : 'flex-start',
-        alignItems: 'flex-start',
-      }}
-    >
-      {speakers.map((speaker) => (
-        <SpeakerCard
-          key={speaker.id}
-          speaker={speaker}
-          accent={accent}
-          primary={primary}
-          bf={bf}
-          df={df}
-          centered={centered}
-          size={imageSize}
-        />
-      ))}
     </div>
   );
 }
@@ -237,12 +160,33 @@ export function TaglineBar({ tagline, reglink, bf, primary }) {
   );
 }
 
-export function SpeakerFooter({ poster, accent, bf, df, centered = true, primary = '#fff' }) {
-  const speakers = getSpeakers(poster);
-  if (!speakers.length) return null;
+export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
+  const normalizedSpeakers = Array.isArray(poster.speakers)
+    ? poster.speakers.filter((speaker) => speaker.name || speaker.img)
+    : [];
+  const speaker1 = normalizedSpeakers[0] || {
+    img: poster.sp1img,
+    name: poster.sp1name,
+    title: poster.sp1title,
+    details: poster.sp1details ?? poster.sp1alumni,
+  };
+  const speaker2 = normalizedSpeakers[1] || {
+    img: poster.sp2img,
+    name: poster.sp2name,
+    title: poster.sp2title,
+    details: poster.sp2details ?? poster.sp2alumni,
+  };
+  const hasSpeaker = speaker1.name || speaker1.img || speaker2.name || speaker2.img;
+  if (!hasSpeaker) return null;
 
   return (
-    <div style={{ padding: '16px 24px' }}>
+    <div
+      style={{
+        background: 'rgba(0,0,0,0.38)',
+        padding: '16px 24px',
+        borderTop: `2px solid ${accent}`,
+      }}
+    >
       <div
         style={{
           fontFamily: bf,
@@ -254,16 +198,37 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true, primary
           marginBottom: 12,
         }}
       >
-        Resource Person{speakers.length > 1 ? 's' : ''}
+        Resource Person{speaker2.name ? 's' : ''}
       </div>
-      <SpeakerGallery
-        poster={poster}
-        accent={accent}
-        primary={primary}
-        bf={bf}
-        df={df}
-        centered={centered}
-      />
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14,
+          alignItems: centered ? 'center' : 'flex-start',
+        }}
+      >
+        <SpeakerCard
+          img={speaker1.img}
+          name={speaker1.name}
+          title={speaker1.title}
+          alumni={speaker1.details}
+          accent={accent}
+          df={df}
+          bf={bf}
+        />
+        {speaker2.name && (
+          <SpeakerCard
+            img={speaker2.img}
+            name={speaker2.name}
+            title={speaker2.title}
+            alumni={speaker2.details}
+            accent={accent}
+            df={df}
+            bf={bf}
+          />
+        )}
+      </div>
     </div>
   );
 }
