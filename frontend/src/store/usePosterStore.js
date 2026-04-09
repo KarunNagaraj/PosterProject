@@ -108,6 +108,7 @@ export const usePosterStore = create((set, get) => ({
   activePosterId: null,
   lastSyncedSnapshot: serializeEditorState(createPosterState(), createDesignState()),
   hasUnsavedChanges: false,
+  
 
   setPosterField: (key, value) =>
     set((state) =>

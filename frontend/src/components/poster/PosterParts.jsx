@@ -1,4 +1,5 @@
 import { SDG_OPTIONS } from '../../constants';
+import { DraggableItem } from './DraggableItem';
 
 export function SpeakerCard({
   img,
@@ -98,6 +99,7 @@ export function SpeakerCard({
     </div>
   );
 }
+
 
 export function InfoRow({ icon, text, accent, bf, align }) {
   if (!text) return null;
@@ -232,6 +234,7 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
     </div>
   );
 }
+
 
 export function SDGBlock({ sdgs = [], size = 32, gap = 6, align = 'flex-start' }) {
   const selected = sdgs
