@@ -1,5 +1,7 @@
 import { jsPDF } from 'jspdf';
-import { GRADIENTS } from '../constants';
+import { GRADIENTS, POSTER_SIZES } from '../constants';
+
+const BASE_LAYOUT_HEIGHT = 594;
 
 // ── Date / Time Formatters ────────────────────
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -28,6 +30,18 @@ export function getBodyFont(font) {
 
 export function scaleFont(size, scale = 1) {
   return Math.round(size * scale);
+}
+
+export function getPosterMetrics(sizeKey) {
+  const size = POSTER_SIZES[sizeKey] || POSTER_SIZES.signagePortrait;
+  const contentScale = Math.max(size.h / BASE_LAYOUT_HEIGHT, 1);
+
+  return {
+    ...size,
+    contentScale,
+    viewportWidth: Math.round(size.w / contentScale),
+    viewportHeight: Math.round(size.h / contentScale),
+  };
 }
 
 // ── Background CSS String ─────────────────────
@@ -77,12 +91,14 @@ export function randomItem(arr) {
 }
 
 // ── QR code generation ────────────────────────
-export async function generateQRDataUrl(text) {
+export async function generateQRDataUrl(text, sizeKey = 'signagePortrait') {
   if (!text) return null;
   try {
     const QRCode = (await import('qrcode')).default;
+    const { contentScale } = getPosterMetrics(sizeKey);
+
     return await QRCode.toDataURL(text, {
-      width: 80,
+      width: Math.max(160, Math.round(80 * contentScale * 2)),
       margin: 1,
       color: { dark: '#000000', light: '#ffffff' },
     });
@@ -103,10 +119,11 @@ export async function downloadPoster(elementId, baseFilename = 'poster', format 
     // Measure the natural size of the poster (ignoring RightPanel CSS scales)
     const naturalW = el.offsetWidth;
     const naturalH = el.offsetHeight;
+    const renderScale = format === 'pdf' ? 3 : 1;
 
-    // Shared configuration to guarantee exact 1:1 color & layout parity
+    // PNG/JPEG should respect the exact preset size; PDF can render at higher density.
     const options = {
-      scale: 3, // 3x render scale for print-ready crispness
+      scale: renderScale,
       width: naturalW,
       height: naturalH,
       backgroundColor: null,

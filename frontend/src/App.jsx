@@ -1,15 +1,9 @@
+import { RouterProvider } from 'react-router-dom';
 import { usePosterEffects } from './hooks/usePosterEffects';
-import LeftPanel from './components/LeftPanel';
-import RightPanel from './components/RightPanel';
-import styles from './App.module.css';
+import { router } from './routes';
 
 export default function App() {
   usePosterEffects();
 
-  return (
-    <div className={styles.app}>
-      <LeftPanel />
-      <RightPanel />
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }

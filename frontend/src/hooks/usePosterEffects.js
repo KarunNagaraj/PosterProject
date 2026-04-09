@@ -4,6 +4,7 @@ import { usePosterStore } from '../store/usePosterStore';
 
 export function usePosterEffects() {
   const reglink = usePosterStore((state) => state.poster.reglink);
+  const size = usePosterStore((state) => state.design.size);
   const isDark = usePosterStore((state) => state.isDark);
   const setQrDataUrl = usePosterStore((state) => state.setQrDataUrl);
   const qrTimer = useRef(null);
@@ -23,7 +24,7 @@ export function usePosterEffects() {
     let cancelled = false;
 
     qrTimer.current = setTimeout(async () => {
-      const url = await generateQRDataUrl(reglink);
+      const url = await generateQRDataUrl(reglink, size);
       if (!cancelled) {
         setQrDataUrl(url);
       }
@@ -33,5 +34,5 @@ export function usePosterEffects() {
       cancelled = true;
       clearTimeout(qrTimer.current);
     };
-  }, [reglink, setQrDataUrl]);
+  }, [reglink, setQrDataUrl, size]);
 }

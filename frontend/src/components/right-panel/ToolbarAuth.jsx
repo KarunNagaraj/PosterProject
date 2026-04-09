@@ -23,7 +23,7 @@ export default function ToolbarAuth() {
             <div className={styles.authName}>{displayName}</div>
           </div>
           <UserButton afterSignOutUrl="/" />
-          <SignOutButton>
+          <SignOutButton redirectUrl="/">
             <Button variant="ghost" className={styles.signOutButton}>
               Sign Out
             </Button>

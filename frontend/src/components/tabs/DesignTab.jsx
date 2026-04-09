@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { FieldGroup, Select, SectionLabel, Button, UploadBox, TextInput } from '../UI';
+import { FieldGroup, Select, SectionLabel, Button, UploadBox } from '../UI';
 import {
   GRADIENTS, ACCENTS, PRIMARY_COLORS, FONT_PAIRS, LAYOUT_NAMES,
   BG_TYPES, POSTER_SIZES,
@@ -123,13 +122,7 @@ export default function DesignTab() {
     align,
     size,
     textScale,
-    customTextboxes,
-    selectedCanvasElement,
     setDesignField,
-    addCustomTextbox,
-    updateCustomTextbox,
-    removeCustomTextbox,
-    selectCanvasElement,
   } = usePosterStore(
     useShallow((state) => ({
       layout: state.design.layout,
@@ -143,24 +136,11 @@ export default function DesignTab() {
       align: state.design.align,
       size: state.design.size,
       textScale: state.design.textScale,
-      customTextboxes: state.design.customTextboxes,
-      selectedCanvasElement: state.selectedCanvasElement,
       setDesignField: state.setDesignField,
-      addCustomTextbox: state.addCustomTextbox,
-      updateCustomTextbox: state.updateCustomTextbox,
-      removeCustomTextbox: state.removeCustomTextbox,
-      selectCanvasElement: state.selectCanvasElement,
     }))
   );
 
   const showGradientPanel = ['gradient', 'pattern', 'mesh'].includes(bgtype);
-  const selectedTextbox = useMemo(
-    () =>
-      selectedCanvasElement?.kind === 'textbox'
-        ? customTextboxes.find((textbox) => textbox.id === selectedCanvasElement.id) || null
-        : null,
-    [customTextboxes, selectedCanvasElement]
-  );
 
   const handleBgImage = async (file) => {
     const b64 = await fileToBase64(file);
@@ -174,124 +154,6 @@ export default function DesignTab() {
         selected={layout}
         onChange={(value) => setDesignField('layout', value)}
       />
-
-      <SectionLabel>Text Boxes</SectionLabel>
-      <Button
-        variant="primary"
-        onClick={() =>
-          addCustomTextbox({
-            x: 48,
-            y: 48,
-            fontSize: 20,
-            color: primary,
-            fontFamily: 'body',
-            width: 180,
-          })
-        }
-      >
-        Add Text Box
-      </Button>
-
-      <div className={styles.textboxList}>
-        {customTextboxes.length === 0 ? (
-          <div className={styles.textboxEmpty}>No custom text boxes yet.</div>
-        ) : (
-          customTextboxes.map((textbox, index) => (
-            <button
-              key={textbox.id}
-              className={[
-                styles.textboxItem,
-                selectedTextbox?.id === textbox.id && styles.textboxItemSelected,
-              ].filter(Boolean).join(' ')}
-              onClick={() =>
-                selectCanvasElement({
-                  kind: 'textbox',
-                  id: textbox.id,
-                })
-              }
-            >
-              <span>{textbox.text || `Textbox ${index + 1}`}</span>
-            </button>
-          ))
-        )}
-      </div>
-
-      {selectedTextbox ? (
-        <>
-          <SectionLabel>Selected Text Box</SectionLabel>
-          <FieldGroup label="Text">
-            <textarea
-              className={styles.textboxEditor}
-              value={selectedTextbox.text}
-              onChange={(event) =>
-                updateCustomTextbox(selectedTextbox.id, { text: event.target.value })
-              }
-            />
-          </FieldGroup>
-
-          <FieldGroup label="Font">
-            <Select
-              value={selectedTextbox.fontFamily}
-              onChange={(value) =>
-                updateCustomTextbox(selectedTextbox.id, { fontFamily: value })
-              }
-              options={[
-                { value: 'body', label: 'Current Body Font' },
-                { value: 'display', label: 'Current Heading Font' },
-                { value: 'Georgia,serif', label: 'Georgia' },
-                { value: 'Trebuchet MS,sans-serif', label: 'Trebuchet MS' },
-                { value: 'Verdana,sans-serif', label: 'Verdana' },
-                { value: 'Arial,sans-serif', label: 'Arial' },
-              ]}
-            />
-          </FieldGroup>
-
-          <FieldGroup label="Font Size">
-            <input
-              className={styles.textboxControl}
-              type="number"
-              min="10"
-              max="120"
-              value={selectedTextbox.fontSize}
-              onChange={(event) =>
-                updateCustomTextbox(selectedTextbox.id, {
-                  fontSize: parseInt(event.target.value, 10) || selectedTextbox.fontSize,
-                })
-              }
-            />
-          </FieldGroup>
-
-          <FieldGroup label="Box Width">
-            <input
-              className={styles.textboxControl}
-              type="number"
-              min="80"
-              max="600"
-              value={selectedTextbox.width}
-              onChange={(event) =>
-                updateCustomTextbox(selectedTextbox.id, {
-                  width: parseInt(event.target.value, 10) || selectedTextbox.width,
-                })
-              }
-            />
-          </FieldGroup>
-
-          <FieldGroup label="Colour">
-            <input
-              type="color"
-              value={selectedTextbox.color}
-              onChange={(event) =>
-                updateCustomTextbox(selectedTextbox.id, { color: event.target.value })
-              }
-              className={styles.solidColorPicker}
-            />
-          </FieldGroup>
-
-          <Button variant="ghost" onClick={() => removeCustomTextbox(selectedTextbox.id)}>
-            Delete Text Box
-          </Button>
-        </>
-      ) : null}
 
       <SectionLabel>Background</SectionLabel>
       <FieldGroup label="Style">

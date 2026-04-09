@@ -1,8 +1,5 @@
-import { useShallow } from 'zustand/react/shallow';
-import { GRADIENTS, SDG_OPTIONS } from '../../../constants';
+import { GRADIENTS } from '../../../constants';
 import { buildBackground, formatDate, formatTime, getDisplayFont, getBodyFont, scaleFont } from '../../../utils';
-import { usePosterStore } from '../../../store/usePosterStore';
-import MovableElement from '../MovableElement';
 import { SpeakerGallery, SpeakerFooter, InfoRow, QRBlock, TaglineBar, SDGBlock, getSpeakers } from '../PosterParts';
 
 // ── Shared props shape ────────────────────────
@@ -25,59 +22,10 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
 }
 
 function CanvasMove({
-  layoutId,
-  elementId,
   children,
-  resizable = false,
-  defaultWidth,
-  defaultHeight,
-  minWidth,
-  minHeight,
   wrapperStyle,
 }) {
-  const {
-    selectedCanvasElement,
-    movableElementsByLayout,
-    updateMovableElement,
-    selectCanvasElement,
-  } = usePosterStore(
-    useShallow((state) => ({
-      selectedCanvasElement: state.selectedCanvasElement,
-      movableElementsByLayout: state.design.movableElementsByLayout,
-      updateMovableElement: state.updateMovableElement,
-      selectCanvasElement: state.selectCanvasElement,
-    }))
-  );
-
-  const position = movableElementsByLayout?.[layoutId]?.[elementId] || {};
-
-  return (
-    <MovableElement
-      elementId={elementId}
-      position={position}
-      selected={
-        selectedCanvasElement?.kind === 'layout-element' &&
-        selectedCanvasElement?.id === elementId &&
-        selectedCanvasElement?.layoutId === layoutId
-      }
-      resizable={resizable}
-      defaultWidth={defaultWidth}
-      defaultHeight={defaultHeight}
-      minWidth={minWidth}
-      minHeight={minHeight}
-      onSelect={() =>
-        selectCanvasElement({
-          kind: 'layout-element',
-          id: elementId,
-          layoutId,
-        })
-      }
-      onChange={(patch) => updateMovableElement(layoutId, elementId, patch)}
-      wrapperStyle={wrapperStyle}
-    >
-      {children}
-    </MovableElement>
-  );
+  return wrapperStyle ? <div style={wrapperStyle}>{children}</div> : children;
 }
 
 // ─────────────────────────────────────────────

@@ -21,15 +21,10 @@ const createPosterState = () => ({
 const createDesignState = () => ({
   ...DEFAULT_DESIGN,
   textScale: { ...DEFAULT_DESIGN.textScale },
-  movableElementsByLayout: {},
-  customTextboxes: [],
 });
 
 const createSpeakerId = () =>
   `speaker-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
-
-const createTextboxId = () =>
-  `textbox-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
 const normalizeSpeakers = (savedPoster = {}) => {
   if (Array.isArray(savedPoster.speakers)) {
@@ -76,29 +71,18 @@ const mergePosterState = (savedPoster = {}) => ({
     : [...createPosterState().sdgs],
 });
 
-const mergeDesignState = (savedDesign = {}) => ({
-  ...createDesignState(),
-  ...savedDesign,
-  textScale: {
-    ...createDesignState().textScale,
-    ...(savedDesign.textScale || {}),
-  },
-  movableElementsByLayout: savedDesign.movableElementsByLayout || {},
-  customTextboxes: Array.isArray(savedDesign.customTextboxes)
-    ? savedDesign.customTextboxes
-    : [],
-});
+const mergeDesignState = (savedDesign = {}) => {
+  const { customTextboxes: _customTextboxes, ...restDesign } = savedDesign;
 
-const mergeLayoutElementPatch = (movableElementsByLayout, layoutId, elementId, patch) => ({
-  ...movableElementsByLayout,
-  [layoutId]: {
-    ...(movableElementsByLayout[layoutId] || {}),
-    [elementId]: {
-      ...(movableElementsByLayout[layoutId]?.[elementId] || {}),
-      ...patch,
+  return {
+    ...createDesignState(),
+    ...restDesign,
+    textScale: {
+      ...createDesignState().textScale,
+      ...(savedDesign.textScale || {}),
     },
-  },
-});
+  };
+};
 
 const withDirtyState = (state, patch) => {
   const nextPoster = patch.poster ?? state.poster;
@@ -124,7 +108,6 @@ export const usePosterStore = create((set, get) => ({
   activePosterId: null,
   lastSyncedSnapshot: serializeEditorState(createPosterState(), createDesignState()),
   hasUnsavedChanges: false,
-  selectedCanvasElement: null,
 
   setPosterField: (key, value) =>
     set((state) =>
@@ -194,98 +177,6 @@ export const usePosterStore = create((set, get) => ({
       })
     ),
 
-  updateMovableElement: (layoutId, elementId, patch) =>
-    set((state) =>
-      withDirtyState(state, {
-        design: {
-          ...state.design,
-          movableElementsByLayout: mergeLayoutElementPatch(
-            state.design.movableElementsByLayout,
-            layoutId,
-            elementId,
-            patch
-          ),
-        },
-      })
-    ),
-
-  addCustomTextbox: (textbox = {}) => {
-    const id = createTextboxId();
-
-    set((state) =>
-      withDirtyState(state, {
-        design: {
-          ...state.design,
-          customTextboxes: [
-            ...state.design.customTextboxes,
-            {
-              id,
-              text: 'Add your text',
-              x: 48,
-              y: 48,
-              width: 180,
-              fontSize: 20,
-              color: state.design.primary,
-              fontFamily: 'body',
-              ...textbox,
-            },
-          ],
-        },
-      })
-    );
-
-    set({
-      selectedCanvasElement: {
-        kind: 'textbox',
-        id,
-      },
-    });
-  },
-
-  updateCustomTextbox: (textboxId, patch) =>
-    set((state) =>
-      withDirtyState(state, {
-        design: {
-          ...state.design,
-          customTextboxes: state.design.customTextboxes.map((textbox) =>
-            textbox.id === textboxId
-              ? {
-                  ...textbox,
-                  ...patch,
-                }
-              : textbox
-          ),
-        },
-      })
-    ),
-
-  removeCustomTextbox: (textboxId) =>
-    set((state) => ({
-      ...withDirtyState(state, {
-        design: {
-          ...state.design,
-          customTextboxes: state.design.customTextboxes.filter(
-            (textbox) => textbox.id !== textboxId
-          ),
-        },
-      }),
-      selectedCanvasElement:
-        state.selectedCanvasElement?.kind === 'textbox' &&
-        state.selectedCanvasElement?.id === textboxId
-          ? null
-          : state.selectedCanvasElement,
-    })),
-
-  selectCanvasElement: (selection) =>
-    set({
-      selectedCanvasElement: selection,
-    }),
-
-  clearCanvasSelection: () =>
-    set({
-      selectedCanvasElement: null,
-    }),
-
   applyCategoryTheme: (category) => {
     const theme = CATEGORY_THEMES[category];
     if (!theme) return;
@@ -343,7 +234,6 @@ export const usePosterStore = create((set, get) => ({
         activePosterId: savedPoster._id,
         lastSyncedSnapshot: serializeEditorState(poster, design),
         hasUnsavedChanges: false,
-        selectedCanvasElement: null,
       };
     }),
 
@@ -358,7 +248,6 @@ export const usePosterStore = create((set, get) => ({
         activePosterId: savedPoster?._id ?? state.activePosterId,
         lastSyncedSnapshot: serializeEditorState(poster, design),
         hasUnsavedChanges: false,
-        selectedCanvasElement: null,
       };
     }),
 

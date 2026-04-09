@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import PosterCanvas from './poster/PosterCanvas';
 import { Button } from './UI';
-import { downloadPoster } from '../utils';
+import { downloadPoster, getPosterMetrics } from '../utils';
 import { usePosterStore } from '../store/usePosterStore';
 import styles from './RightPanel.module.css';
 import LoadButton from './right-panel/LoadButton';
@@ -40,7 +40,7 @@ function ShareMenu() {
   if (!el) return;
 
   const blob = await domToBlob(el, {
-    scale: 3,
+    scale: 1,
     type: 'image/png',
     style: { transform: 'none', overflow: 'visible' },
   });
@@ -94,6 +94,8 @@ function ShareMenu() {
 // ── Main Right Panel ─────────────────────────────────────────
 export default function RightPanel() {
   const [downloadFormat, setDownloadFormat] = useState('png');
+  const [previewScale, setPreviewScale] = useState(1);
+  const previewAreaRef = useRef(null);
 
   const {
     category,
@@ -101,6 +103,7 @@ export default function RightPanel() {
     gradient,
     accent,
     font,
+    size,
     randomizeAll,
     randomizeLayout,
   } = usePosterStore(
@@ -110,10 +113,13 @@ export default function RightPanel() {
       gradient: state.design.gradient,
       accent: state.design.accent,
       font: state.design.font,
+      size: state.design.size,
       randomizeAll: state.randomizeAll,
       randomizeLayout: state.randomizeLayout,
     }))
   );
+
+  const { w, h } = getPosterMetrics(size);
 
   // Trigger flash animation on randomize
   useEffect(() => {
@@ -123,6 +129,28 @@ export default function RightPanel() {
     void el.offsetWidth; // reflow
     el.classList.add('poster-flash');
   }, [layout, gradient, accent, font]);
+
+  useEffect(() => {
+    const previewArea = previewAreaRef.current;
+    if (!previewArea) return undefined;
+
+    const updatePreviewScale = () => {
+      const availableWidth = Math.max(previewArea.clientWidth - 24, 1);
+      const availableHeight = Math.max(previewArea.clientHeight - 24, 1);
+      const nextScale = Math.min(availableWidth / w, availableHeight / h, 1);
+
+      setPreviewScale(nextScale);
+    };
+
+    updatePreviewScale();
+
+    const resizeObserver = new ResizeObserver(updatePreviewScale);
+    resizeObserver.observe(previewArea);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [h, w]);
 
   const handleDownload = () => {
     const safeCategory = category ? category.toLowerCase().replace(/\s+/g, '-') : 'event';
@@ -180,9 +208,25 @@ export default function RightPanel() {
         </div>
       </div>
 
-      <div className={styles.previewArea}>
-        <div className={styles.shadow}>
-          <PosterCanvas />
+      <div className={styles.previewArea} ref={previewAreaRef}>
+        <div
+          className={styles.previewViewport}
+          style={{
+            width: Math.round(w * previewScale),
+            height: Math.round(h * previewScale),
+          }}
+        >
+          <div
+            className={styles.shadow}
+            style={{
+              width: w,
+              height: h,
+              transform: `scale(${previewScale})`,
+              transformOrigin: 'top left',
+            }}
+          >
+            <PosterCanvas />
+          </div>
         </div>
       </div>
     </main>

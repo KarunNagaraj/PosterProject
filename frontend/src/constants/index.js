@@ -73,10 +73,9 @@ export const CATEGORIES = [
 
 // ── Poster size dimensions [width, height] px ─
 export const POSTER_SIZES = {
-  a4:    { label: 'A4 Portrait (420×594)',  w: 420, h: 594 },
-  a4l:   { label: 'A4 Landscape (594×420)', w: 594, h: 420 },
-  sq:    { label: 'Square (480×480)',        w: 480, h: 480 },
-  story: { label: 'Story / Reel (360×640)', w: 360, h: 640 },
+  signagePortrait: { label: 'Portrait Signage (1080×1515)', w: 1080, h: 1515 },
+  signageLandscape: { label: 'Landscape Signage (1920×1080)', w: 1920, h: 1080 },
+  ledWall: { label: 'LED Wall (1620×810)', w: 1620, h: 810 },
 };
 
 // ── Background types ──────────────────────────
@@ -167,11 +166,214 @@ export const DEFAULT_DESIGN = {
   primary: '#FFFFFF',
   font: 'Georgia,serif|Trebuchet MS,sans-serif',
   align: 'center',
-  size: 'a4',
-  movableElementsByLayout: {},
-  customTextboxes: [],
+  size: 'signagePortrait',
   textScale: {
-  primary: 1,     // headings
-  secondary: 1,   // subtitles, metadata
-}
+    primary: 1, // headings
+    secondary: 1, // subtitles, metadata
+  },
 };
+
+const cloneDefaultSpeaker = (speaker) => ({ ...speaker });
+
+const cloneDefaultDesign = (overrides = {}) => {
+  const { customTextboxes: _customTextboxes, ...designOverrides } = overrides;
+
+  return {
+    ...DEFAULT_DESIGN,
+    ...designOverrides,
+    textScale: {
+      ...DEFAULT_DESIGN.textScale,
+      ...(overrides.textScale || {}),
+    },
+  };
+};
+
+const cloneDefaultPoster = (overrides = {}) => ({
+  ...DEFAULT_STATE,
+  ...overrides,
+  speakers: Array.isArray(overrides.speakers)
+    ? overrides.speakers.map((speaker, index) => ({
+        id: speaker.id || `landing-speaker-${index + 1}`,
+        role: '',
+        name: '',
+        title: '',
+        details: '',
+        img: null,
+        ...speaker,
+      }))
+    : DEFAULT_STATE.speakers.map(cloneDefaultSpeaker),
+  sdgs: Array.isArray(overrides.sdgs) ? [...overrides.sdgs] : [...DEFAULT_STATE.sdgs],
+});
+
+const createLandingPreset = ({
+  id,
+  kicker,
+  description,
+  poster,
+  design,
+}) => ({
+  id,
+  kicker,
+  description,
+  poster: cloneDefaultPoster(poster),
+  design: cloneDefaultDesign(design),
+});
+
+export const LANDING_POSTER_PRESETS = [
+  createLandingPreset({
+    id: 'ml-workshop',
+    kicker: 'Workshop',
+    description: 'A high-energy portrait layout for hands-on faculty and student sessions.',
+    poster: {
+      university: 'Christ University',
+      dept: 'School of Sciences',
+      campus: 'Central Campus, Bangalore',
+      category: 'Workshop',
+      title: 'AI Design Sprint',
+      subtitle: 'Prototype, prompt, and publish in one afternoon',
+      date: '2026-04-18',
+      time: '14:00',
+      venue: 'Innovation Lab 2',
+      audience: 'Design and CS students',
+      tagline: 'Build sharp visuals without a long production cycle',
+      speakers: [
+        {
+          id: 'landing-speaker-ai-1',
+          role: 'Lead Mentor',
+          name: 'Asha Menon',
+          title: 'Creative Technologist',
+          details: 'Interaction Design Lab',
+          img: null,
+        },
+        {
+          id: 'landing-speaker-ai-2',
+          role: 'Guest Expert',
+          name: 'Rohan Xavier',
+          title: 'ML Product Designer',
+          details: 'Studio North',
+          img: null,
+        },
+      ],
+    },
+    design: {
+      layout: 4,
+      bgtype: 'gradient',
+      gradient: 9,
+      accent: '#FFB4A2',
+      primary: '#FFFFFF',
+      font: 'Montserrat,sans-serif|Poppins,sans-serif',
+      size: 'signagePortrait',
+    },
+  }),
+  createLandingPreset({
+    id: 'research-symposium',
+    kicker: 'Symposium',
+    description: 'A formal composition tuned for keynote-heavy academic events.',
+    poster: {
+      university: 'Christ University',
+      dept: 'Centre for Research',
+      campus: 'Bannerghatta Road Campus',
+      category: 'Symposium',
+      title: 'Future of Learning Systems',
+      subtitle: 'Research talks on adaptive education and applied AI',
+      date: '2026-05-02',
+      time: '09:30',
+      venue: 'Main Auditorium',
+      audience: 'Faculty, researchers, and PG scholars',
+      tagline: 'Elegant academic communication for flagship events',
+      speakers: [
+        {
+          id: 'landing-speaker-research-1',
+          role: 'Keynote',
+          name: 'Dr. Mira Nair',
+          title: 'Professor, Learning Sciences',
+          details: 'National Institute of Education',
+          img: null,
+        },
+      ],
+    },
+    design: {
+      layout: 7,
+      bgtype: 'gradient',
+      gradient: 11,
+      accent: '#FFD700',
+      primary: '#FFFFFF',
+      font: "'Palatino Linotype',serif|Optima,sans-serif",
+      size: 'signagePortrait',
+    },
+  }),
+  createLandingPreset({
+    id: 'hacknight',
+    kicker: 'Hackathon',
+    description: 'A wide-format event poster built for social sharing and hallway displays.',
+    poster: {
+      university: 'Christ University',
+      dept: 'Tech Club',
+      campus: 'Kengeri Campus',
+      category: 'Hackathon',
+      title: 'Midnight Buildathon',
+      subtitle: '24 hours of rapid prototyping and live demos',
+      date: '2026-05-14',
+      time: '18:00',
+      venue: 'Digital Fabrication Studio',
+      audience: 'Interdisciplinary student teams',
+      tagline: 'Fast visuals for fast-moving campus events',
+      speakers: [
+        {
+          id: 'landing-speaker-hack-1',
+          role: 'Host',
+          name: 'Campus Tech Guild',
+          title: 'Student Innovation Collective',
+          details: 'Open to all departments',
+          img: null,
+        },
+      ],
+    },
+    design: {
+      layout: 6,
+      bgtype: 'gradient',
+      gradient: 7,
+      accent: '#4ECDC4',
+      primary: '#FFFFFF',
+      font: "'Courier New',monospace|Tahoma,sans-serif",
+      size: 'signageLandscape',
+    },
+  }),
+  createLandingPreset({
+    id: 'faculty-webinar',
+    kicker: 'Webinar',
+    description: 'A clean remote-event treatment that still feels distinctly academic.',
+    poster: {
+      university: 'Christ University',
+      dept: 'Faculty Development Cell',
+      campus: 'Remote Broadcast Series',
+      category: 'Webinar',
+      title: 'From Draft to Defense',
+      subtitle: 'Publishing strategies for emerging researchers',
+      date: '2026-05-28',
+      time: '17:30',
+      venue: 'Online via Teams',
+      audience: 'Faculty members and research assistants',
+      tagline: 'Built for online sessions, exports, and cross-channel promotion',
+      speakers: [
+        {
+          id: 'landing-speaker-webinar-1',
+          role: 'Speaker',
+          name: 'Prof. Elena Dsouza',
+          title: 'Editor, Journal of Digital Pedagogy',
+          details: 'Research and Publications Office',
+          img: null,
+        },
+      ],
+    },
+    design: {
+      layout: 9,
+      bgtype: 'gradient',
+      gradient: 10,
+      accent: '#90E0EF',
+      primary: '#FFFFFF',
+      font: 'Georgia,serif|Trebuchet MS,sans-serif',
+      size: 'ledWall',
+    },
+  }),
+];
