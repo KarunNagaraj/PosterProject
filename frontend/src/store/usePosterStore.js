@@ -357,4 +357,13 @@ export const usePosterStore = create((set, get) => ({
       titlePosition: pos,
     },
   })),
+  updatePosition: (id, pos) => set((state) => ({
+  poster: {
+    ...state.poster,
+    positions: {
+      ...state.poster.positions,
+      [id]: pos
+    }
+  }
+})),
 }));

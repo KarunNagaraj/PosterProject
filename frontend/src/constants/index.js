@@ -126,10 +126,6 @@ export const DEFAULT_STATE = {
   // Event
   category: 'Workshop',
   title: 'Introduction to Machine Learning',
-  titlePosition: {
-  x: 0,
-  y: 0,
-  },
   subtitle: 'Bridging Theory and Practice',
   date: '2025-04-15',
   time: '10:00',
@@ -137,6 +133,25 @@ export const DEFAULT_STATE = {
   audience: 'II & III Year B.E. / B.Tech Students',
   reglink: '',
   showQR: false,
+  
+  // ── NEW: Centralized Positions Object ──
+  positions: {
+    logo: { x: 0, y: 0 },
+    university: { x: 0, y: 0 },
+    dept: { x: 0, y: 0 },
+    campus: { x: 0, y: 0 },
+    category: { x: 0, y: 0 },
+    title: { x: 0, y: 0 },
+    subtitle: { x: 0, y: 0 },
+    sp1Img: { x: 0, y: 0 },
+    sp1Details: { x: 0, y: 0 },
+    sp2Img: { x: 0, y: 0 },
+    sp2Details: { x: 0, y: 0 },
+    date: { x: 0, y: 0 },
+    venue: { x: 0, y: 0 },
+    sdgs: { x: 0, y: 0 },
+  },
+
   // Speakers
   speakers: [
     {
@@ -162,12 +177,12 @@ export const DEFAULT_STATE = {
 // ── Default design state ──────────────────────
 export const DEFAULT_DESIGN = {
   layout: 0,
-  bgtype: 'solid',
+  bgtype: 'mesh',
   gradient: 2,
   bgcolor: '#1e3a5f',
   bgimg: null,
-  accent: '#38ef7d',
-  primary: '#FFFFFF',
+  accent: '#ddd1ff',
+  primary: '#eee7e7',
   font: 'Georgia,serif|Trebuchet MS,sans-serif',
   align: 'center',
   size: 'signagePortrait',

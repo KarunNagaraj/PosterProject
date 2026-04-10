@@ -1,108 +1,41 @@
 import { SDG_OPTIONS } from '../../constants';
 import { DraggableItem } from './DraggableItem';
 
-export function SpeakerCard({
-  img,
-  name,
-  title,
-  alumni,
-  accent,
-  df,
-  bf,
-  size = 52,
-}) {
+// ── New Sub-components for independent dragging ──
+export function SpeakerPhoto({ img, name, accent, size = 52 }) {
+  return img ? (
+    <img
+      src={img}
+      alt={name}
+      draggable={false} // Prevents native browser image dragging crashes
+      style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${accent}`, flexShrink: 0 }}
+    />
+  ) : (
+    <div style={{ width: size, height: size, borderRadius: '50%', background: `${accent}28`, border: `2px solid ${accent}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: size > 44 ? 20 : 16 }}>
+      👤
+    </div>
+  );
+}
+
+export function SpeakerText({ name, title, alumni, accent, df, bf }) {
+  return (
+    <div style={{ textAlign: 'center' }}>
+      {name && <div style={{ fontFamily: df, fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{name}</div>}
+      {title && <div style={{ fontFamily: bf, fontSize: 10, color: accent, marginTop: 1 }}>{title}</div>}
+      {alumni && <div style={{ fontFamily: bf, fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 1, fontStyle: 'italic' }}>{alumni}</div>}
+    </div>
+  );
+}
+
+// ── Reconstructed SpeakerCard (Used by SpeakerFooter) ──
+export function SpeakerCard({ img, name, title, alumni, accent, df, bf, size = 52 }) {
   if (!name && !img) return null;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 10,
-        width: 220,
-      }}
-    >
-      {img ? (
-        <DraggableItem>
-        <img
-          src={img}
-          alt={name}
-          style={{
-            width: size,
-            height: size,
-            borderRadius: '50%',
-            objectFit: 'cover',
-            border: `2px solid ${accent}`,
-            flexShrink: 0,
-          }}
-        />
-        </DraggableItem>
-      ) : (
-        <DraggableItem>
-        <div
-          style={{
-            width: size,
-            height: size,
-            borderRadius: '50%',
-            background: `${accent}28`,
-            border: `2px solid ${accent}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            fontSize: size > 44 ? 20 : 16,
-          }}
-        >
-          👤
-        </div>
-        </DraggableItem>
-      )}
-      <DraggableItem>
-      <div style={{ flex: 1 }}>
-        {name ? (
-          <div
-            style={{
-              fontFamily: df,
-              fontSize: 13,
-              fontWeight: 700,
-              color: '#fff',
-              lineHeight: 1.2,
-            }}
-          >
-            {name}
-          </div>
-        ) : null}
-
-        {title ? (
-          <div
-            style={{
-              fontFamily: bf,
-              fontSize: 10,
-              color: accent,
-              marginTop: 1,
-            }}
-          >
-            {title}
-          </div>
-        ) : null}
-
-        {alumni ? (
-          <div
-            style={{
-              fontFamily: bf,
-              fontSize: 9,
-              color: 'rgba(255,255,255,0.5)',
-              marginTop: 1,
-              fontStyle: 'italic',
-            }}
-          >
-            {alumni}
-          </div>
-        ) : null}
-        
-      </div>
-      </DraggableItem>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, width: 220 }}>
+      {/* We do NOT wrap these in DraggableItems here so SpeakerFooter stays static/safe */}
+      <SpeakerPhoto img={img} name={name} accent={accent} size={size} />
+      <SpeakerText name={name} title={title} alumni={alumni} accent={accent} df={df} bf={bf} />
     </div>
   );
 }
