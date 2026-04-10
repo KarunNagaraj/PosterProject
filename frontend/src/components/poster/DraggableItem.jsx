@@ -1,11 +1,19 @@
 import React, { useState, useRef } from 'react';
+import { useEffect } from 'react';
 
 // ── Drag & Drop Wrapper ─────────────────────────────────────
-export function DraggableItem({ children }) {
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+export function DraggableItem({ children, id, onPositionChange, initialPos }) {
+  const [pos, setPos] = useState(initialPos || { x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const startPos = useRef({ x: 0, y: 0 });
+  
 
+  useEffect(() => {
+    if (initialPos) {
+      setPos(initialPos);
+    }
+  }, [initialPos]);
+  
   const onPointerDown = (e) => {
     setIsDragging(true);
     // Calculate where inside the element the user clicked
@@ -23,10 +31,19 @@ export function DraggableItem({ children }) {
   };
 
   const onPointerUp = (e) => {
-    setIsDragging(false);
-    e.target.releasePointerCapture(e.pointerId);
+  setIsDragging(false);
+  e.target.releasePointerCapture(e.pointerId);
+
+  const finalPos = {
+    x: e.clientX - startPos.current.x,
+    y: e.clientY - startPos.current.y,
   };
 
+  setPos(finalPos);
+  onPositionChange?.(id, finalPos);
+};
+   
+  
   return (
     <div
       onPointerDown={onPointerDown}

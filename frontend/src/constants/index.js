@@ -126,6 +126,10 @@ export const DEFAULT_STATE = {
   // Event
   category: 'Workshop',
   title: 'Introduction to Machine Learning',
+  titlePosition: {
+  x: 0,
+  y: 0,
+  },
   subtitle: 'Bridging Theory and Practice',
   date: '2025-04-15',
   time: '10:00',
