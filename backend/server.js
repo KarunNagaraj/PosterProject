@@ -105,6 +105,52 @@ app.post('/api/posters', requireAuth(), async (req, res) => {
     res.status(500).json({ error: 'Failed to save poster' });
   }
 });
+// UPDATE Poster Title
+app.patch('/api/posters/:id/title', requireAuth(), async (req, res) => {
+  try {
+    const userId = req.auth().userId;
+    const { id } = req.params;
+    const { title } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
+
+    const poster = await Poster.findOneAndUpdate(
+      { _id: id, clerkId: userId },
+      { title: title },
+      { new: true } // Returns the updated document
+    );
+
+    if (!poster) {
+      return res.status(404).json({ error: 'Poster not found' });
+    }
+
+    res.json({ _id: poster._id, title: poster.title });
+  } catch (error) {
+    console.error('Update title error:', error);
+    res.status(500).json({ error: 'Failed to update title' });
+  }
+});
+
+// DELETE Poster
+app.delete('/api/posters/:id', requireAuth(), async (req, res) => {
+  try {
+    const userId = req.auth().userId;
+    const { id } = req.params;
+
+    const poster = await Poster.findOneAndDelete({ _id: id, clerkId: userId });
+
+    if (!poster) {
+      return res.status(404).json({ error: 'Poster not found' });
+    }
+
+    res.json({ message: 'Poster deleted successfully' });
+  } catch (error) {
+    console.error('Delete poster error:', error);
+    res.status(500).json({ error: 'Failed to delete poster' });
+  }
+});
 
 // Serve frontend
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

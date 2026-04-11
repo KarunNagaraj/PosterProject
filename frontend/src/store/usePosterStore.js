@@ -301,6 +301,55 @@ export const usePosterStore = create((set, get) => ({
       set({ isLoadingPoster: false });
     }
   },
+  renameSavedPoster: async (posterId, newTitle, token) => {
+    try {
+      const response = await fetch(`/api/posters/${posterId}/title`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: newTitle }),
+      });
+
+      if (!response.ok) throw new Error('Failed to rename poster');
+
+      // Update the title in the local store
+      set((state) => ({
+        savedPosters: state.savedPosters.map((poster) =>
+          poster._id === posterId ? { ...poster, title: newTitle } : poster
+        ),
+      }));
+      return true;
+    } catch (error) {
+      console.error('Error renaming poster:', error);
+      alert('Failed to rename poster. Please try again.');
+      return false;
+    }
+  },
+
+  deleteSavedPoster: async (posterId, token) => {
+    try {
+      const response = await fetch(`/api/posters/${posterId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Failed to delete poster');
+
+      // Remove the poster from the local store
+      set((state) => ({
+        savedPosters: state.savedPosters.filter((poster) => poster._id !== posterId),
+      }));
+      return true;
+    } catch (error) {
+      console.error('Error deleting poster:', error);
+      alert('Failed to delete poster. Please try again.');
+      return false;
+    }
+  },
 
   savePosterToCloud: async (token) => {
     set({ isSaving: true });
