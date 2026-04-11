@@ -106,58 +106,32 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
   const normalizedSpeakers = Array.isArray(poster.speakers)
     ? poster.speakers.filter((speaker) => speaker.name || speaker.img)
     : [];
-  const speaker1 = normalizedSpeakers[0] || {
-    img: poster.sp1img,
-    name: poster.sp1name,
-    title: poster.sp1title,
-    details: poster.sp1details ?? poster.sp1alumni,
-  };
-  const speaker2 = normalizedSpeakers[1] || {
-    img: poster.sp2img,
-    name: poster.sp2name,
-    title: poster.sp2title,
-    details: poster.sp2details ?? poster.sp2alumni,
-  };
-  const hasSpeaker = speaker1.name || speaker1.img || speaker2.name || speaker2.img;
-  if (!hasSpeaker) return null;
+    
+  if (normalizedSpeakers.length === 0) return null;
 
   return (
-    <div
-      style={{
-        
-        padding: '16px 24px',
-        
-      }}
-    >
-
+    <div style={{ padding: '16px 24px' }}>
       <div
         style={{
           display: 'flex',
           flexDirection: 'row',
           gap: 14,
           alignItems: centered ? 'center' : 'flex-start',
+          flexWrap: 'wrap' // Ensures multiple speakers wrap cleanly to the next line
         }}
       >
-        <SpeakerCard
-          img={speaker1.img}
-          name={speaker1.name}
-          title={speaker1.title}
-          alumni={speaker1.details}
-          accent={accent}
-          df={df}
-          bf={bf}
-        />
-        
+        {normalizedSpeakers.map((speaker) => (
           <SpeakerCard
-            img={speaker2.img}
-            name={speaker2.name}
-            title={speaker2.title}
-            alumni={speaker2.details}
+            key={speaker.id}
+            img={speaker.img}
+            name={speaker.name}
+            title={speaker.title}
+            alumni={speaker.details} 
             accent={accent}
             df={df}
             bf={bf}
           />
-        
+        ))}
       </div>
     </div>
   );

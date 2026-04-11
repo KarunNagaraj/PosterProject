@@ -134,7 +134,6 @@ export const DEFAULT_STATE = {
   reglink: '',
   showQR: false,
   
-  // ── NEW: Centralized Positions Object ──
   positions: {
     logo: { x: 0, y: 0 },
     university: { x: 0, y: 0 },
@@ -143,13 +142,14 @@ export const DEFAULT_STATE = {
     category: { x: 0, y: 0 },
     title: { x: 0, y: 0 },
     subtitle: { x: 0, y: 0 },
-    sp1Img: { x: 0, y: 0 },
-    sp1Details: { x: 0, y: 0 },
-    sp2Img: { x: 0, y: 0 },
-    sp2Details: { x: 0, y: 0 },
     date: { x: 0, y: 0 },
     venue: { x: 0, y: 0 },
     sdgs: { x: 0, y: 0 },
+    // Replace sp1Img/sp2Img with dynamic string keys matching the default speaker IDs below
+    'speaker-1-img': { x: 0, y: 0 },
+    'speaker-1-details': { x: 0, y: 0 },
+    'speaker-2-img': { x: 0, y: 0 },
+    'speaker-2-details': { x: 0, y: 0 },
   },
 
   // Speakers
