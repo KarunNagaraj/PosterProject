@@ -19,7 +19,8 @@ export function SpeakerPhoto({ img, name, accent, size = 52 }) {
 
 export function SpeakerText({ name, title, alumni, accent, df, bf }) {
   return (
-    <div style={{ textAlign: 'center' }}>
+    // ADDED: width: 100% and wordBreak to allow text to wrap natively inside a squished column
+    <div style={{ textAlign: 'center', width: '100%', wordBreak: 'break-word' }}>
       {name && <div style={{ fontFamily: df, fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{name}</div>}
       {title && <div style={{ fontFamily: bf, fontSize: 10, color: accent, marginTop: 1 }}>{title}</div>}
       {alumni && <div style={{ fontFamily: bf, fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 1, fontStyle: 'italic' }}>{alumni}</div>}
@@ -32,7 +33,9 @@ export function SpeakerCard({ img, name, title, alumni, accent, df, bf, size = 5
   if (!name && !img) return null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, width: 220 }}>
+    // FIXED: Removed width: 220. Added flex: 1 1 0% and min/max width bounds.
+    // This tells the card "Grow if you can, shrink if you have to, but don't drop below 80px wide."
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: '1 1 0%', minWidth: 80, maxWidth: 200 }}>
       {/* We do NOT wrap these in DraggableItems here so SpeakerFooter stays static/safe */}
       <SpeakerPhoto img={img} name={name} accent={accent} size={size} />
       <SpeakerText name={name} title={title} alumni={alumni} accent={accent} df={df} bf={bf} />
@@ -110,14 +113,16 @@ export function SpeakerFooter({ poster, accent, bf, df, centered = true }) {
   if (normalizedSpeakers.length === 0) return null;
 
   return (
-    <div style={{ padding: '16px 24px' }}>
+    <div style={{ padding: '16px 24px', width: '100%', boxSizing: 'border-box' }}>
       <div
         style={{
           display: 'flex',
           flexDirection: 'row',
           gap: 14,
           alignItems: centered ? 'center' : 'flex-start',
-          flexWrap: 'wrap' // Ensures multiple speakers wrap cleanly to the next line
+          justifyContent: centered ? 'center' : 'flex-start', // Centers them horizontally
+          flexWrap: 'wrap', 
+          width: '100%'
         }}
       >
         {normalizedSpeakers.map((speaker) => (

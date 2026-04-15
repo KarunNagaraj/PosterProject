@@ -6,6 +6,7 @@ import { usePosterStore } from '../../../store/usePosterStore';
 import { useState } from 'react';
 import { ResizableSpeakerImage } from '../ResizableSpeakerImage';
 
+
 function useLayoutProps({ poster, design, qrDataUrl }) {
   const acc = design.accent;
   const pri = design.primary;
@@ -18,7 +19,6 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
   const showQR = poster.showQR && !!qrDataUrl;
   const textScale = design.textScale || { primary: 1, secondary: 1 };
   
-  // Get all speakers that have either a name or an image
   const normalizedSpeakers = Array.isArray(poster.speakers)
     ? poster.speakers.filter((speaker) => speaker.name || speaker.img)
     : [];
@@ -28,42 +28,45 @@ function useLayoutProps({ poster, design, qrDataUrl }) {
   const positions = poster.positions || {};
   const updatePosition = usePosterStore((state) => state.updatePosition);
 
-  // Return normalizedSpeakers instead of speaker1/speaker2
   return { acc, pri, al, df, bf, bg, g, dateTimeStr, showQR, textScale, normalizedSpeakers, hasSpeaker, updatePosition, positions };
 }
 
 // ─────────────────────────────────────────────
-// L0 — Classic
+// L0 — Classic (Strict Flexbox Architecture)
 // ─────────────────────────────────────────────
 export function L0_Classic({ poster, design, qrDataUrl }) {
-  const { acc, pri, al, df, bf, bg, textScale, hasSpeaker, dateTimeStr, updatePosition, positions, speaker1, speaker2, normalizedSpeakers} = useLayoutProps({ poster, design, qrDataUrl });
+  const { acc, pri, al, df, bf, bg, textScale, hasSpeaker, dateTimeStr, updatePosition, positions, normalizedSpeakers} = useLayoutProps({ poster, design, qrDataUrl });
   const alignStyle = { textAlign: al };
 
+  // --- NEW: Decoupled Dynamic Scaling ---
+  const speakerCount = normalizedSpeakers.length;
+  let speakerGap = 24;
+  let imageScale = 1;
+  let textScaleMult = 1;
+
+  if (speakerCount === 3) {
+    speakerGap = 16;
+    imageScale = 0.85;
+    textScaleMult = 0.95; // Barely shrink text
+  } else if (speakerCount >= 4) {
+    speakerGap = 10;
+    imageScale = 0.65; // Shrink images to free up horizontal space
+    textScaleMult = 0.88; // Keep text readable
+  }
+
   return (
-    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
+    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
       
-      {/* Header */}
-      <div style={{ position: 'relative', background: 'rgba(0,0,0,0.38)', padding: '22px 24px', ...alignStyle, borderBottom: `3px solid ${acc}` }}>
+      {/* 1 & 2. HEADER BLOCK */}
+      <div style={{ flex: '0 0 auto', background: 'rgba(0,0,0,0.38)', padding: '22px 24px', ...alignStyle, borderBottom: `3px solid ${acc}` }}>
         {poster.logoImg && (
-          <div style={{ height: 64, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: al === 'left' ? 'flex-start' : al === 'right' ? 'flex-end' : 'center' }}>
+          <div style={{ height: 64, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: al === 'left' ? 'flex-start' : al === 'right' ? 'flex-end' : 'center' }}>
             <DraggableItem id="logo" initialPos={positions.logo} onPositionChange={updatePosition}>
-              <img
-                src={poster.logoImg}
-                alt="logo"
-                style={{
-                  height: 56,
-                  width: 'auto',
-                  maxWidth: 160,
-                  objectFit: 'contain',
-                  display: 'block',
-                  filter: 'drop-shadow(0px 4px 12px rgba(0,0,0,0.5))',
-                }}
-              />
+              <img src={poster.logoImg} alt="logo" style={{ height: 56, width: 'auto', maxWidth: 160, objectFit: 'contain', display: 'block', filter: 'drop-shadow(0px 4px 12px rgba(0,0,0,0.5))' }} />
             </DraggableItem>
           </div>
         )}
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2}}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {poster.university && (
             <DraggableItem id="university" initialPos={positions.university} onPositionChange={updatePosition}>
               <div style={{ fontFamily: df, fontSize: scaleFont(17, textScale.primary), fontWeight: 700, color: pri, letterSpacing: '0.04em' }}>{poster.university}</div>
@@ -82,284 +85,481 @@ export function L0_Classic({ poster, design, qrDataUrl }) {
         </div>
       </div>
 
-      {/* Category band */}
-      <div style={{ padding: '5px 24px', textAlign: 'center' }}>
+      <div style={{ flex: '0 0 auto', padding: '5px 24px', textAlign: 'center' }}>
         <DraggableItem id="category" initialPos={positions.category} onPositionChange={updatePosition}>
           <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'inline-block' }}>{poster.category}</span>
         </DraggableItem>
       </div>
 
-      {/* Body */}
-      <div style={{ padding: '26px 24px', ...alignStyle, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      {/* 3, 4, 5. BODY BLOCK */}
+      <div style={{ flex: '1 1 0%', padding: '16px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', minHeight: 0, gap: '16px', ...alignStyle }}>
         
-        <DraggableItem id="title" initialPos={positions.title} onPositionChange={updatePosition}>
-          {poster.title
-            ? <div style={{ fontFamily: df, fontSize: scaleFont(26, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 10, textShadow: '0 2px 14px rgba(0,0,0,0.4)'}}>{poster.title}</div>
-            : <div style={{ fontFamily: 'Georgia', fontSize: scaleFont(20, textScale.primary), color: `${pri}33`, fontStyle: 'italic' }}>Event Title</div>
-          }
-        </DraggableItem>
-        
-        {poster.subtitle && (
-          <DraggableItem id="subtitle" initialPos={positions.subtitle} onPositionChange={updatePosition}>
-            <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, marginBottom: 18, fontStyle: 'italic' }}>{poster.subtitle}</div>
-          </DraggableItem>
-        )}
-  
-        {/* Dynamic Speakers Container */}
-        {hasSpeaker && (
-          <div style={{ paddingTop: 16, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 60, flexWrap: 'wrap' }}>
-            {normalizedSpeakers.map((speaker) => (
-              <div key={speaker.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-                
-                {/* Dynamically assign Draggable IDs based on the unique speaker ID */}
-                <DraggableItem 
-                  id={`${speaker.id}-img`} 
-                  initialPos={positions[`${speaker.id}-img`] || { x: 0, y: 0 }} 
-                  onPositionChange={updatePosition} 
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
-                >
-                  <ResizableSpeakerImage src={speaker.img} alt={speaker.name} acc={acc} />
-                </DraggableItem>
-                
-                <DraggableItem 
-                  id={`${speaker.id}-details`} 
-                  initialPos={positions[`${speaker.id}-details`] || { x: 0, y: 0 }} 
-                  onPositionChange={updatePosition} 
-                  style={{ textAlign: 'center' }}
-                >
-                  {speaker.name && <div style={{ fontFamily: df, fontSize: scaleFont(16, textScale.primary), fontWeight: 700, color: pri }}>{speaker.name}</div>}
-                  {speaker.title && <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, marginTop: 3 }}>{speaker.title}</div>}
-                  {speaker.details && <div style={{ fontFamily: bf, fontSize: 11, color: `${pri}99`, marginTop: 2, fontStyle: 'italic' }}>{speaker.details}</div>}
-                </DraggableItem>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Date + Venue */}
-        {(dateTimeStr || poster.venue) && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginTop: 30 }}>
-            {dateTimeStr && (
-              <DraggableItem id="date" initialPos={positions.date} onPositionChange={updatePosition}>
-                <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri, padding: '8px 12px', background: 'rgba(255,255,255,0.08)', borderRadius: 10 }}>
-                  📅 {dateTimeStr}
-                </div>
-              </DraggableItem>
-            )}
-            {poster.venue && (
-              <DraggableItem id="venue" initialPos={positions.venue} onPositionChange={updatePosition}>
-                <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri, padding: '8px 12px', background: 'rgba(255,255,255,0.08)', borderRadius: 10 }}>
-                  📍 {poster.venue}
-                </div>
-              </DraggableItem>
-            )}
-          </div>
-        )}
-        
-        <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
-      </div>
-
-      <div style={{ position: 'relative' }}>
-        <div style={{ position: 'absolute', right: 24, top: '50%' }}>
-          <div style={{ transform: 'translateY(-50%)' }}>
-            <DraggableItem id="sdgs" initialPos={positions.sdgs} onPositionChange={updatePosition}>
-              <SDGBlock sdgs={poster.sdgs} size={30} />
-            </DraggableItem>
-          </div>
-        </div>
-      </div>
-      
-      <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} bf={bf} primary={pri} />
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// L1 — Editorial
-// ─────────────────────────────────────────────
-export function L1_Editorial({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, bg, textScale, normalizedSpeakers, hasSpeaker, positions, updatePosition } = useLayoutProps({ poster, design, qrDataUrl });
-
-  return (
-    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit', position: 'relative' }}>
-      <div style={{ position: 'absolute', top: 0, right: 0, width: 4, height: '100%', background: acc }} />
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '55%', height: 4, background: acc }} />
-
-      <div style={{ padding: '28px 36px 0 28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* ... (Institution, Category, Title, Info, QR remain the same) ... */}
-        
-        {/* Institution row */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}>
-          {poster.logoImg && (
-              <DraggableItem id="logo" initialPos={positions?.logo} onPositionChange={updatePosition}>
-                <img src={poster.logoImg} alt="logo" draggable={false} style={{ height: 60, width: 60, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6, marginBottom: 10, position: 'relative' }} />
-              </DraggableItem>
-          )}
-            <div>
-              {poster.university && <DraggableItem id="university" initialPos={positions?.university} onPositionChange={updatePosition}><div style={{ fontFamily: df, fontSize: scaleFont(14, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div></DraggableItem>}
-              {poster.dept && <DraggableItem id="dept" initialPos={positions?.dept} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc, marginTop: 2 }}>{poster.dept}</div></DraggableItem>}
-              {poster.campus && <DraggableItem id="campus" initialPos={positions?.campus} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: `${pri}80`, marginTop: 1 }}>{poster.campus}</div></DraggableItem>}
-            </div>
-        </div>
-
-        {/* Category */}
-        <DraggableItem id="category" initialPos={positions?.category} onPositionChange={updatePosition}>
-          <div style={{ display: 'inline-block', background: acc, padding: '4px 14px', borderRadius: 2, marginBottom: 16, alignSelf: 'flex-start' }}>
-            <span style={{ fontFamily: bf, fontSize: 10, fontWeight: 700, color: '#000', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{poster.category}</span>
-          </div>
-        </DraggableItem>
-
-        {/* Title */}
-        <DraggableItem id="title" initialPos={positions?.title} onPositionChange={updatePosition}>
-          {poster.title
-          ? <div style={{ fontFamily: df, fontSize: scaleFont(28, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.15, marginBottom: 8, paddingRight: 20 }}>{poster.title}</div>
-          : <div style={{ fontSize: scaleFont(20, textScale.primary), color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Event title appears here</div>
-          }
-        </DraggableItem>
-
-        {poster.subtitle && (
-            <DraggableItem id="subtitle" initialPos={positions?.subtitle} onPositionChange={updatePosition}>
-              <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 12 }}>{poster.subtitle}</div>
-            </DraggableItem>
-        )}
-
-        <div style={{ width: 48, height: 2, background: acc, margin: '14px 0' }} />
-
-        {/* Info */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {(poster.date || poster.time) && (
-            <DraggableItem id="date" initialPos={positions?.date} onPositionChange={updatePosition}>
-              <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}><span style={{ color: acc }}>▸</span> {formatDate(poster.date)}{poster.date && poster.time ? ' at ' : ''}{formatTime(poster.time)}</div>
-            </DraggableItem>
-          )}
-          {poster.venue && (
-            <DraggableItem id="venue" initialPos={positions?.venue} onPositionChange={updatePosition}>
-              <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}><span style={{ color: acc }}>▸</span> {poster.venue}</div>
-            </DraggableItem>
-          )}
-          {poster.audience && (
-            <DraggableItem id="audience" initialPos={positions?.audience} onPositionChange={updatePosition}>
-              <div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}99` }}><span style={{ color: acc }}>▸</span> {poster.audience}</div>
-            </DraggableItem>
-          )}
-        </div>
-
-        <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
-        <div style={{ flex: 1 }} />
-      </div>
-
-      {/* ── FOOTER COLUMN ── */}
-      {hasSpeaker && (
-        <div style={{ padding: '36px 28px 0px 28px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {/* ROW 1: Speakers (Centered, dynamic) */}
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
-            {normalizedSpeakers.map((speaker) => (
-              <div key={speaker.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, width: 160 }}>
-                <DraggableItem id={`${speaker.id}-img`} initialPos={positions?.[`${speaker.id}-img`]} onPositionChange={updatePosition}>
-                  <SpeakerPhoto img={speaker.img} name={speaker.name} accent={acc} />
-                </DraggableItem>
-                <DraggableItem id={`${speaker.id}-details`} initialPos={positions?.[`${speaker.id}-details`]} onPositionChange={updatePosition}>
-                  <SpeakerText name={speaker.name} title={speaker.title} alumni={speaker.details} accent={acc} df={df} bf={bf} />
-                </DraggableItem>
-              </div>
-            ))}
-          </div>
-
-          {/* ROW 2: SDGs */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingBottom: 16 }}>
-            <DraggableItem id="sdgs" initialPos={positions?.sdgs} onPositionChange={updatePosition}>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
-                <SDGBlock sdgs={poster.sdgs} size={36} />
-              </div>
-            </DraggableItem>
-          </div>
-        </div>
-      )}
-
-      {/* ROW 3: Tagline */}
-      {(poster.tagline || poster.reglink) && (
-        <div style={{ padding: '12px 28px', borderTop: `1px solid rgba(255,255,255,0.1)`, textAlign: 'center', background: 'rgba(0,0,0,0.4)' }}>
-            <DraggableItem id="tagline" initialPos={positions?.tagline} onPositionChange={updatePosition}>
-              <span style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc, fontStyle: 'italic', letterSpacing: '0.05em' }}>{poster.tagline || poster.reglink}</span>
-            </DraggableItem>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// L2 — Split
-// ─────────────────────────────────────────────
-export function L2_Split({ poster, design, qrDataUrl }) {
-  const { acc, pri, df, bf, g, textScale, normalizedSpeakers, hasSpeaker, positions, updatePosition } = useLayoutProps({ poster, design, qrDataUrl });
-
-  return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', minHeight: 'inherit' }}>
-      {/* Top half */}
-      <div style={{ flex: '0 0 40%', background: `linear-gradient(160deg,${g[0]},${g[1]})`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 70% 30%,${acc}20,transparent 60%)` }} />
-        {poster.logoImg && <DraggableItem id="logo" initialPos={positions?.logo} onPositionChange={updatePosition}><img src={poster.logoImg} alt="logo" style={{ height: 60, width: 60, objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: 6, marginBottom: 10, position: 'relative' }} /></DraggableItem>}
-        
-        <div style={{ position: 'relative', textAlign: 'center' }}>
-          {poster.university && <DraggableItem id="university" initialPos={positions?.university} onPositionChange={updatePosition}><div style={{ fontFamily: df, fontSize: scaleFont(15, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div></DraggableItem>}
-          {poster.dept && <DraggableItem id="dept" initialPos={positions?.dept} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc, marginTop: 3 }}>{poster.dept}</div></DraggableItem>}
-          {poster.campus && <DraggableItem id="campus" initialPos={positions?.campus} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: `${pri}80`, marginTop: 2 }}>{poster.campus}</div></DraggableItem>}
-        </div>
-        
-        <DraggableItem id="category" initialPos={positions?.category} onPositionChange={updatePosition}>
-          <div style={{ marginTop: 16, background: acc, padding: '5px 18px', borderRadius: 20 }}>
-            <span style={{ fontFamily: bf, fontSize: 10, fontWeight: 700, color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{poster.category}</span>
-          </div>
-        </DraggableItem>
-      </div>
-
-      {/* Bottom half */}
-      <div style={{ flex: 1, background: `linear-gradient(160deg,${g[1]},${g[2]})`, padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <div>
-          <DraggableItem id="title" initialPos={positions?.title} onPositionChange={updatePosition}>
+        <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <DraggableItem id="title" initialPos={positions.title} onPositionChange={updatePosition}>
             {poster.title
-              ? <div style={{ fontFamily: df, fontSize: scaleFont(22, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.2, marginBottom: 8 }}>{poster.title}</div>
-              : <div style={{ fontSize: scaleFont(18, textScale.primary), color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Your event title</div>
+              ? <div style={{ fontFamily: df, fontSize: scaleFont(26, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.2, textShadow: '0 2px 14px rgba(0,0,0,0.4)'}}>{poster.title}</div>
+              : <div style={{ fontFamily: 'Georgia', fontSize: scaleFont(20, textScale.primary), color: `${pri}33`, fontStyle: 'italic' }}>Event Title</div>
             }
           </DraggableItem>
-          {poster.subtitle && <DraggableItem id="subtitle" initialPos={positions?.subtitle} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 14 }}>{poster.subtitle}</div></DraggableItem>}
-          
-          <div style={{ background: 'rgba(0,0,0,0.22)', borderRadius: 8, padding: 12, marginTop: 10, display: 'flex', flexDirection: 'column', gap: 7, borderLeft: `3px solid ${acc}` }}>
-            {(poster.date || poster.time) && <DraggableItem id="date" initialPos={positions?.date} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>📅 {formatDate(poster.date)}{poster.date && poster.time ? ' · ' : ''}{formatTime(poster.time)}</div></DraggableItem>}
-            {poster.venue && <DraggableItem id="venue" initialPos={positions?.venue} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>📍 {poster.venue}</div></DraggableItem>}
-            {poster.audience && <DraggableItem id="audience" initialPos={positions?.audience} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}A5` }}>👥 {poster.audience}</div></DraggableItem>}
-          </div>
+          {poster.subtitle && (
+            <DraggableItem id="subtitle" initialPos={positions.subtitle} onPositionChange={updatePosition}>
+              <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.secondary), color: acc, fontStyle: 'italic' }}>{poster.subtitle}</div>
+            </DraggableItem>
+          )}
         </div>
-        
-        <div>
-          {hasSpeaker && (
-            <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
-              <DraggableItem id="speaker-label" initialPos={positions?.['speaker-label']} onPositionChange={updatePosition}>
-                <div style={{ fontFamily: bf, fontSize: scaleFont(9, textScale.secondary), color: acc, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Speakers</div>
-              </DraggableItem>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+  
+        {/* Row 4: Speakers - STRICT SINGLE ROW */}
+        {hasSpeaker && (
+          <div style={{ 
+            flex: '1 1 0%', 
+            minHeight: 0, 
+            display: 'flex', 
+            flexDirection: 'row', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            flexWrap: 'nowrap',
+            gap: speakerGap,
+            width: '100%'
+          }}>
+            {normalizedSpeakers.map((speaker) => (
+              <div key={speaker.id} style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                flex: '1 1 0%', 
+                minWidth: 0,    
+                maxWidth: 180, 
+                gap: 6 // Tighter gap between image and text to save vertical space
+              }}>
+                <DraggableItem id={`${speaker.id}-img`} initialPos={positions[`${speaker.id}-img`] || { x: 0, y: 0 }} onPositionChange={updatePosition} 
+                  style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                    {/* Apply the more aggressive imageScale here */}
+                    <div style={{ zoom: imageScale }}> 
+                      <ResizableSpeakerImage src={speaker.img} alt={speaker.name} acc={acc} />
+                    </div>
+                </DraggableItem>
                 
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  {normalizedSpeakers.map((speaker) => (
-                    <DraggableItem key={speaker.id} id={`${speaker.id}-card`} initialPos={positions?.[`${speaker.id}-card`]} onPositionChange={updatePosition}>
-                      <SpeakerCard img={speaker.img} name={speaker.name} title={speaker.title} alumni={speaker.details} accent={acc} df={df} bf={bf} />
-                    </DraggableItem>
-                  ))}
-                </div>
-
-                <DraggableItem id="sdgs" initialPos={positions?.sdgs} onPositionChange={updatePosition}><SDGBlock sdgs={poster.sdgs} size={30} /></DraggableItem>
+                <DraggableItem id={`${speaker.id}-details`} initialPos={positions[`${speaker.id}-details`] || { x: 0, y: 0 }} onPositionChange={updatePosition} 
+                  style={{ textAlign: 'center', width: '100%', wordBreak: 'break-word' }}>
+                  
+                  {/* Name: Use dynamic primary color (pri) */}
+                  {speaker.name && <div style={{ fontFamily: df, fontSize: Math.max(12, scaleFont(15 * textScaleMult, textScale.primary)), fontWeight: 700, color: pri, lineHeight: 1.1 }}>{speaker.name}</div>}
+                  
+                  {/* Title: Use dynamic accent color (acc) */}
+                  {speaker.title && <div style={{ fontFamily: bf, fontSize: Math.max(10, scaleFont(12 * textScaleMult, textScale.secondary)), color: acc, marginTop: 3 }}>{speaker.title}</div>}
+                  
+                  {/* Details: Use primary color at 60% opacity (${pri}99) */}
+                  {speaker.details && <div style={{ fontFamily: bf, fontSize: Math.max(9, 10 * textScaleMult), color: `${pri}99`, marginTop: 2, fontStyle: 'italic' }}>{speaker.details}</div>}
+                  
+                </DraggableItem>
               </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Row 5: Event Details */}
+        <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          {(dateTimeStr || poster.venue) && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+              {dateTimeStr && (
+                <DraggableItem id="date" initialPos={positions.date} onPositionChange={updatePosition}>
+                  <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri, padding: '8px 12px', background: 'rgba(255,255,255,0.08)', borderRadius: 10 }}>📅 {dateTimeStr}</div>
+                </DraggableItem>
+              )}
+              {poster.venue && (
+                <DraggableItem id="venue" initialPos={positions.venue} onPositionChange={updatePosition}>
+                  <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri, padding: '8px 12px', background: 'rgba(255,255,255,0.08)', borderRadius: 10 }}>📍 {poster.venue}</div>
+                </DraggableItem>
+              )}
             </div>
           )}
           <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
         </div>
       </div>
-      <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} bf={bf} primary={pri} />
+
+      {/* 6. FOOTER BLOCK */}
+      <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 24px 12px' }}>
+          <DraggableItem id="sdgs" initialPos={positions.sdgs} onPositionChange={updatePosition}>
+            <SDGBlock sdgs={poster.sdgs} size={30} />
+          </DraggableItem>
+        </div>
+        <TaglineBar tagline={poster.tagline} reglink={poster.reglink} accent={acc} bf={bf} primary={pri} />
+      </div>
+
     </div>
   );
 }
 
+// ─────────────────────────────────────────────
+// L1 — Editorial (Flush Badge & Soft Glow)
+// ─────────────────────────────────────────────
+export function L1_Editorial({ poster, design, qrDataUrl }) {
+  const { acc, pri, df, bf, bg, textScale, normalizedSpeakers, hasSpeaker, positions, updatePosition } = useLayoutProps({ poster, design, qrDataUrl });
+
+  // --- Decoupled Dynamic Scaling ---
+  const speakerCount = normalizedSpeakers.length;
+  let speakerGap = 24;
+  let imageScale = 1;
+  let textScaleMult = 1;
+
+  if (speakerCount === 3) {
+    speakerGap = 16;
+    imageScale = 0.85;
+    textScaleMult = 0.95;
+  } else if (speakerCount >= 4) {
+    speakerGap = 10;
+    imageScale = 0.65;
+    textScaleMult = 0.88;
+  }
+
+  return (
+    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', boxSizing: 'border-box' }}>
+      
+      {/* 1. TOP BLOCK (Institution, Category, Title, Info) - Fixed Height */}
+      <div style={{ padding: '36px 40px 0 40px', flex: '0 0 auto', display: 'flex', flexDirection: 'column' }}>
+        
+        {/* Header Row: Logo + Vertical Line + Text */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+          {poster.logoImg && (
+            <DraggableItem id="logo" initialPos={positions?.logo} onPositionChange={updatePosition}>
+              <div style={{ height: 60, width: 60, borderRadius: '50%', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <img src={poster.logoImg} alt="logo" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
+              </div>
+            </DraggableItem>
+          )}
+          
+          {/* The Sharp Vertical Divider */}
+          <div style={{ width: 2, height: 44, background: 'rgba(255,255,255,0.4)', borderRadius: 2 }} />
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {poster.university && <DraggableItem id="university" initialPos={positions?.university} onPositionChange={updatePosition}><div style={{ fontFamily: df, fontSize: scaleFont(16, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div></DraggableItem>}
+            {poster.dept && <DraggableItem id="dept" initialPos={positions?.dept} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{poster.dept}</div></DraggableItem>}
+            {poster.campus && <DraggableItem id="campus" initialPos={positions?.campus} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(10, textScale.primary), color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>{poster.campus}</div></DraggableItem>}
+          </div>
+        </div>
+
+        {/* The Extended Trapezoid Category Badge */}
+        <DraggableItem id="category" initialPos={positions?.category} onPositionChange={updatePosition}>
+          <div style={{ 
+            display: 'inline-block', 
+            background: `linear-gradient(90deg, ${acc}, transparent)`, 
+            padding: '8px 32px 8px 40px', // Increased left padding to compensate for the margin shift
+            marginLeft: '-40px', // Pulls the badge exactly to the left edge of the poster
+            marginBottom: 24, 
+            alignSelf: 'flex-start',
+            clipPath: 'polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%)',
+          }}>
+            <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{poster.category}</span>
+          </div>
+        </DraggableItem>
+
+        {/* Title & Subtitle */}
+        <DraggableItem id="title" initialPos={positions?.title} onPositionChange={updatePosition}>
+          {poster.title
+          ? <div style={{ fontFamily: df, fontSize: scaleFont(36, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.15, marginBottom: 8, textShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>{poster.title}</div>
+          : <div style={{ fontSize: scaleFont(24, textScale.primary), color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Event title appears here</div>
+          }
+        </DraggableItem>
+
+        {poster.subtitle && (
+          <DraggableItem id="subtitle" initialPos={positions?.subtitle} onPositionChange={updatePosition}>
+            <div style={{ fontFamily: bf, fontSize: scaleFont(15, textScale.secondary), color: 'rgba(255,255,255,0.85)', fontStyle: 'italic', marginBottom: 20 }}>{poster.subtitle}</div>
+          </DraggableItem>
+        )}
+
+        <div style={{ width: '100%', maxWidth: 300, height: 1, background: 'rgba(255,255,255,0.2)', marginBottom: 20 }} />
+
+        {/* Event Info */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {(poster.date || poster.time) && (
+            <DraggableItem id="date" initialPos={positions?.date} onPositionChange={updatePosition}>
+              <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.primary), color: pri, display: 'flex', gap: 10, alignItems: 'center' }}>
+                <span style={{ color: acc, fontSize: 14 }}>📅</span> {formatDate(poster.date)}{poster.date && poster.time ? ' at ' : ''}{formatTime(poster.time)}
+              </div>
+            </DraggableItem>
+          )}
+          {poster.venue && (
+            <DraggableItem id="venue" initialPos={positions?.venue} onPositionChange={updatePosition}>
+              <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.primary), color: pri, display: 'flex', gap: 10, alignItems: 'center' }}>
+                <span style={{ color: acc, fontSize: 14 }}>📍</span> {poster.venue}
+              </div>
+            </DraggableItem>
+          )}
+          {poster.audience && (
+            <DraggableItem id="audience" initialPos={positions?.audience} onPositionChange={updatePosition}>
+              <div style={{ fontFamily: bf, fontSize: scaleFont(13, textScale.primary), color: pri, display: 'flex', gap: 10, alignItems: 'center' }}>
+                <span style={{ color: acc, fontSize: 14 }}>🎓</span> {poster.audience}
+              </div>
+            </DraggableItem>
+          )}
+        </div>
+
+        <QRBlock showQR={poster.showQR} qrDataUrl={qrDataUrl} bf={bf} />
+      </div>
+
+      {/* 2. MIDDLE BLOCK (Speakers) */}
+      {hasSpeaker ? (
+        <div style={{ padding: '16px 28px 0px 28px', flex: '1 1 0%', minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 24 }}>
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'row', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            gap: speakerGap, 
+            flexWrap: 'nowrap',
+            width: '100%' 
+          }}>
+            {normalizedSpeakers.map((speaker) => (
+              <div key={speaker.id} style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                gap: 16, 
+                flex: '1 1 0%', 
+                minWidth: 0, 
+                maxWidth: 180 
+              }}>
+                <DraggableItem id={`${speaker.id}-img`} initialPos={positions?.[`${speaker.id}-img`]} onPositionChange={updatePosition}
+                  style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                  
+                  <div style={{ zoom: imageScale, position: 'relative' }}>
+                    {/* Soft background glow without the hard border ring */}
+                    <div style={{ 
+                      position: 'absolute', 
+                      inset: -12, 
+                      borderRadius: '50%', 
+                      background: acc,
+                      filter: 'blur(18px)',
+                      opacity: 0.35,
+                      zIndex: 0
+                    }} />
+                    
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      {/* Passing 'acc' back to SpeakerPhoto gives it the native thin border */}
+                      <SpeakerPhoto img={speaker.img} name={speaker.name} accent={acc} size={80} />
+                    </div>
+                  </div>
+                </DraggableItem>
+                
+                <DraggableItem id={`${speaker.id}-details`} initialPos={positions?.[`${speaker.id}-details`]} onPositionChange={updatePosition}
+                  style={{ textAlign: 'center', width: '100%', wordBreak: 'break-word' }}>
+                  
+                  {/* Name: Removed quotes from pri */}
+                  {speaker.name && <div style={{ fontFamily: df, fontSize: Math.max(14, scaleFont(16 * textScaleMult, textScale.primary)), fontWeight: 700, color: pri, lineHeight: 1.2 }}>{speaker.name}</div>}
+                  
+                  {/* Title: Removed quotes from acc */}
+                  {speaker.title && <div style={{ fontFamily: bf, fontSize: Math.max(10, scaleFont(12 * textScaleMult, textScale.secondary)), color: acc, marginTop: 4 }}>{speaker.title}</div>}
+                  
+                  {/* Details: Used template literal for translucency */}
+                  {speaker.details && <div style={{ fontFamily: bf, fontSize: Math.max(9, 10 * textScaleMult), color: `${pri}80`, marginTop: 2, fontStyle: 'italic' }}>{speaker.details}</div>}
+                  
+                </DraggableItem>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div style={{ flex: '1 1 0%', minHeight: 0 }} />
+      )}
+
+      {/* 3. BOTTOM BLOCK (SDGs & Tagline) */}
+      <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 40px' }}>
+          <DraggableItem id="sdgs" initialPos={positions?.sdgs} onPositionChange={updatePosition}>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+              <SDGBlock sdgs={poster.sdgs} size={36} />
+            </div>
+          </DraggableItem>
+        </div>
+
+        {(poster.tagline || poster.reglink) && (
+          <div style={{ padding: '12px 28px', borderTop: `1px solid rgba(255,255,255,0.1)`, textAlign: 'center', background: 'rgba(0,0,0,0.4)' }}>
+            <DraggableItem id="tagline" initialPos={positions?.tagline} onPositionChange={updatePosition}>
+              <span style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.secondary), color: acc, fontStyle: 'italic', letterSpacing: '0.05em' }}>{poster.tagline || poster.reglink}</span>
+            </DraggableItem>
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// L2 — Glassmorphism & Grid (Optimized Spacing)
+// ─────────────────────────────────────────────
+export function L2_Split({ poster, design, qrDataUrl }) {
+  const { acc, pri, df, bf, bg, textScale, normalizedSpeakers, hasSpeaker, positions, updatePosition } = useLayoutProps({ poster, design, qrDataUrl });
+
+  // --- Decoupled Dynamic Scaling ---
+  const speakerCount = normalizedSpeakers.length;
+  let speakerGap = 24; 
+  let imageScale = 1;
+  let textScaleMult = 1;
+
+  if (speakerCount === 3) {
+    speakerGap = 16;
+    imageScale = 0.85; 
+    textScaleMult = 0.95;
+  } else if (speakerCount >= 4) {
+    speakerGap = 10;
+    imageScale = 0.70; 
+    textScaleMult = 0.88;
+  }
+
+  // Only render the bottom SDG/QR footer row if there is actually content for it
+  const hasFooterBottom = (poster.sdgs && poster.sdgs.length > 0) || (poster.showQR && !!qrDataUrl);
+
+  return (
+    // MAIN CONTAINER
+    <div style={{ ...parse(bg), width: '100%', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
+      
+      {/* --- TOP SECTION --- */}
+      {/* 1. Space Optimization: Reduced padding from 36/24 to 28/16 */}
+      <div style={{ padding: '28px 36px 16px 36px', display: 'flex', flexDirection: 'column', flex: '1 1 0%', minHeight: 0 }}>
+        
+        {/* TEXT PROTECTOR WRAPPER */}
+        <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column' }}>
+          
+          {/* Header Row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}> {/* 2. Space Optimization: Margin 28 -> 20 */}
+            {poster.logoImg && (
+              <DraggableItem id="logo" initialPos={positions?.logo} onPositionChange={updatePosition}>
+                <img src={poster.logoImg} alt="logo" style={{ height: 56, width: 'auto', maxWidth: 160, objectFit: 'contain', display: 'block', filter: 'drop-shadow(0px 4px 12px rgba(0,0,0,0.5))' }} />
+              </DraggableItem>
+            )}
+            <div>
+              {poster.university && <DraggableItem id="university" initialPos={positions?.university} onPositionChange={updatePosition}><div style={{ fontFamily: df, fontSize: scaleFont(16, textScale.primary), fontWeight: 700, color: pri }}>{poster.university}</div></DraggableItem>}
+              {poster.dept && <DraggableItem id="dept" initialPos={positions?.dept} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.secondary), color: acc, marginTop: 4 }}>{poster.dept}</div></DraggableItem>}
+              {poster.campus && <DraggableItem id="campus" initialPos={positions?.campus} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(11, textScale.primary), color: `${pri}99`, marginTop: 2 }}>{poster.campus}</div></DraggableItem>}
+            </div>
+          </div>
+
+          {/* Category / Workshop Tag */}
+          <DraggableItem id="category" initialPos={positions?.category} onPositionChange={updatePosition}>
+            <div style={{ background: acc, display: 'inline-block', padding: '6px 16px', borderRadius: 4, marginBottom: 16, alignSelf: 'flex-start' }}> {/* 3. Space Optimization: Margin 20 -> 16 */}
+              <span style={{ fontFamily: bf, fontSize: 11, fontWeight: 700, color: '#000', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{poster.category}</span>
+            </div>
+          </DraggableItem>
+
+          {/* Title & Subtitle */}
+          <DraggableItem id="title" initialPos={positions?.title} onPositionChange={updatePosition}>
+            {poster.title
+              ? <div style={{ fontFamily: df, fontSize: scaleFont(32, textScale.primary), fontWeight: 700, color: pri, lineHeight: 1.15, marginBottom: 8 }}>{poster.title}</div>
+              : <div style={{ fontSize: scaleFont(24, textScale.primary), color: `${pri}33`, fontStyle: 'italic', fontFamily: 'Georgia' }}>Your event title</div>
+            }
+          </DraggableItem>
+          {poster.subtitle && <DraggableItem id="subtitle" initialPos={positions?.subtitle} onPositionChange={updatePosition}><div style={{ fontFamily: bf, fontSize: scaleFont(14, textScale.secondary), color: acc, fontStyle: 'italic', marginBottom: 12 }}>{poster.subtitle}</div></DraggableItem>}
+        
+        </div>
+
+        {/* FROSTED GLASS SPEAKER BLOCK */}
+        {hasSpeaker && (
+          <div style={{ flex: '1 1 0%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, marginTop: 12 }}>
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.08)', 
+              backdropFilter: 'blur(16px)', 
+              WebkitBackdropFilter: 'blur(16px)', 
+              border: '1px solid rgba(255, 255, 255, 0.2)', 
+              borderRadius: 16, 
+              padding: '12px 24px', // 4. Space Optimization: Card Padding 16 -> 12
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+              display: 'flex', 
+              flexDirection: 'row', 
+              justifyContent: 'center', 
+              gap: speakerGap, 
+              flexWrap: 'nowrap',
+              width: 'auto',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              overflow: 'hidden'
+            }}>
+              {normalizedSpeakers.map((speaker) => (
+                <div key={speaker.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0%', minWidth: 0, maxWidth: 180, gap: 8 }}> {/* 5. Space Optimization: Image-to-Text Gap 12 -> 8 */}
+                  <DraggableItem id={`${speaker.id}-img`} initialPos={positions?.[`${speaker.id}-img`]} onPositionChange={updatePosition} style={{ width: '100%' }}>
+                    <div style={{ zoom: imageScale, display: 'flex', justifyContent: 'center' }}>
+                      <SpeakerPhoto img={speaker.img} name={speaker.name} accent={acc} size={64} />
+                    </div>
+                  </DraggableItem>
+                  
+                  <DraggableItem id={`${speaker.id}-details`} initialPos={positions?.[`${speaker.id}-details`]} onPositionChange={updatePosition} style={{ textAlign: 'center', width: '100%', wordBreak: 'break-word' }}>
+  
+                              {/* Name: Changed from '#fff' to pri */}
+                              {speaker.name && <div style={{ fontFamily: df, fontSize: Math.max(12, scaleFont(16 * textScaleMult, textScale.primary)), fontWeight: 700, color: pri, lineHeight: 1.2 }}>{speaker.name}</div>}
+                              
+                              {/* Title: Changed to acc (Accent) or pri based on your preference */}
+                              {speaker.title && <div style={{ fontFamily: bf, fontSize: Math.max(10, scaleFont(12 * textScaleMult, textScale.secondary)), color: acc, marginTop: 4 }}>{speaker.title}</div>}
+                              
+                              {/* Details: Changed from rgba white to ${pri}80 (Primary color at 50% opacity) */}
+                              {speaker.details && <div style={{ fontFamily: bf, fontSize: Math.max(9, 10 * textScaleMult), color: `${pri}80`, marginTop: 2, fontStyle: 'italic' }}>{speaker.details}</div>}
+
+</DraggableItem>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* --- FOOTER GRID SECTION --- */}
+      <div style={{ flex: '0 0 auto', background: 'rgba(15, 25, 45, 0.85)', backdropFilter: 'blur(10px)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        
+        {/* Top half of footer: Event Details in 3 Columns */}
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
+          
+          {/* 6. Space Optimization: Event Details Padding 20 -> 16 */}
+          <div style={{ flex: 1, padding: '16px 20px', borderRight: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', gap: 8 }}> 
+            <span style={{ color: acc }}>▸</span>
+            {(poster.date || poster.time) && (
+              <DraggableItem id="date" initialPos={positions?.date} onPositionChange={updatePosition}>
+                <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>{formatDate(poster.date)}{poster.date && poster.time ? ' at ' : ''}<br/>{formatTime(poster.time)}</div>
+              </DraggableItem>
+            )}
+          </div>
+
+          <div style={{ flex: 1, padding: '16px 20px', borderRight: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: acc }}>▸</span>
+            {poster.venue && (
+              <DraggableItem id="venue" initialPos={positions?.venue} onPositionChange={updatePosition}>
+                <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>{poster.venue}</div>
+              </DraggableItem>
+            )}
+          </div>
+
+          <div style={{ flex: 1, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: acc }}>▸</span>
+            {poster.audience && (
+              <DraggableItem id="audience" initialPos={positions?.audience} onPositionChange={updatePosition}>
+                <div style={{ fontFamily: bf, fontSize: scaleFont(12, textScale.primary), color: pri }}>{poster.audience}</div>
+              </DraggableItem>
+            )}
+          </div>
+
+        </div>
+
+        {/* 7. Conditional Bottom Row: ONLY renders if SDGs or QR exist, saving dead space when empty */}
+        {hasFooterBottom && (
+          <div style={{ padding: '10px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <DraggableItem id="sdgs" initialPos={positions?.sdgs} onPositionChange={updatePosition}>
+              <SDGBlock sdgs={poster.sdgs} size={28} />
+            </DraggableItem>
+
+            {poster.showQR && qrDataUrl && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontFamily: bf, textAlign: 'right' }}>Scan to<br/>Register</div>
+                <img src={qrDataUrl} alt="QR Code" style={{ width: 44, height: 44, borderRadius: 4, background: '#fff', padding: 2 }} />
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+
+    </div>
+  );
+}
+  
 // ─────────────────────────────────────────────
 // L3 — Band
 // ─────────────────────────────────────────────
@@ -910,11 +1110,21 @@ function TypoRow({ label, value, acc, pri, bf, dim, textScale }) {
 // ─────────────────────────────────────────────
 function parse(cssStr) {
   const style = {};
-  cssStr.split(';').forEach(decl => {
+  
+  // 1. Protect the base64 semicolon by replacing it with a temporary placeholder
+  const safeStr = cssStr.replace(/;base64,/gi, '___BASE64___');
+  
+  safeStr.split(';').forEach(decl => {
     const [prop, ...vals] = decl.split(':');
     if (!prop || !vals.length) return;
+    
     const key = prop.trim().replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-    style[key] = vals.join(':').trim();
+    
+    // 2. Put the semicolon back into the value after it has been safely split
+    const value = vals.join(':').trim().replace(/___BASE64___/g, ';base64,');
+    
+    style[key] = value;
   });
+  
   return style;
 }
